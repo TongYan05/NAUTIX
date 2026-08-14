@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="shipsensor.inter.AlertRuleMapper">
+
+
+    <insert id="insertBatch"
+            parameterType="java.util.List">
+
+
+        INSERT INTO alert_rule
+        (
+        rule_name,
+        type_id,
+        threshold_value,
+        operator,
+        duration_seconds,
+        alert_level
+        )
+
+        VALUES
+
+
+        <foreach collection="list"
+                 item="item"
+                 separator=",">
+
+            (
+            #{item.ruleName},
+            #{item.typeId},
+            #{item.thresholdValue},
+            #{item.operator},
+            #{item.durationSeconds},
+            #{item.alertLevel}
+            )
+
+        </foreach>
+
+
+    </insert>
+
+
+</mapper>

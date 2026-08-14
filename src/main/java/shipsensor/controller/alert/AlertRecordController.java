@@ -1,4 +1,4 @@
-package shipsensor.controller;
+package shipsensor.controller.alert;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;

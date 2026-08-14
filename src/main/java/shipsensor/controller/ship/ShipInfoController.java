@@ -1,4 +1,4 @@
-package shipsensor.controller;
+package shipsensor.controller.ship;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -74,9 +74,6 @@ public class ShipInfoController {
                     .or().like(ShipInfo::getOperatingCompany, keyword));
         }
 
-        if (shipStatus != null && !shipStatus.isBlank()) {
-            wrapper.eq(ShipInfo::getShipStatus, shipStatus);
-        }
 
         if (shipType != null && !shipType.isBlank()) {
             wrapper.like(ShipInfo::getShipType, shipType);

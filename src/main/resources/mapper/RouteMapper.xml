@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="shipsensor.inter.RouteMapper">
+
+    <insert id="insertBatch">
+        INSERT INTO route (
+            route_name,
+            start_port_id,
+            end_port_id,
+            distance_nm,
+            description
+        ) VALUES
+        <foreach collection="list" item="route" separator=",">
+            (
+                #{route.routeName},
+                #{route.startPortId},
+                #{route.endPortId},
+                #{route.distanceNm},
+                #{route.description}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

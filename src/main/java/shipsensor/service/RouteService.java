@@ -1,4 +1,9 @@
 package shipsensor.service;
 
-public interface RouteService {
+import com.baomidou.mybatisplus.extension.service.IService;
+import shipsensor.entity.Route;
+
+public interface RouteService
+        extends IService<Route> {
+
 }

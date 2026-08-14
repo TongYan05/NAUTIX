@@ -1,4 +1,9 @@
 package shipsensor.service;
 
-public class ShipRuntimeStatusService {
+import com.baomidou.mybatisplus.extension.service.IService;
+import shipsensor.entity.ShipRuntimeStatus;
+
+public interface ShipRuntimeStatusService
+        extends IService<ShipRuntimeStatus> {
+
 }

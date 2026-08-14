@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="shipsensor.inter.RoutePointMapper">
+
+    <insert id="insertBatch">
+        INSERT INTO route_point (
+            route_id,
+            point_order,
+            latitude,
+            longitude
+        ) VALUES
+        <foreach collection="list" item="point" separator=",">
+            (
+                #{point.routeId},
+                #{point.pointOrder},
+                #{point.latitude},
+                #{point.longitude}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

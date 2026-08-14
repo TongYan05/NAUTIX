@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="shipsensor.inter.ShipRuntimeStatusMapper">
+
+    <!-- 插入新状态 -->
+    <insert id="insert">
+        INSERT INTO ship_runtime_status (
+            ship_id,
+            sailing_status,
+            latitude,
+            longitude,
+            speed,
+            heading,
+            engine_load,
+            fuel_percent,
+            weather_id,
+            last_update
+        ) VALUES (
+            #{shipId},
+            #{sailingStatus},
+            #{latitude},
+            #{longitude},
+            #{speed},
+            #{heading},
+            #{engineLoad},
+            #{fuelPercent},
+            #{weatherId},
+            #{lastUpdate}
+        )
+    </insert>
+
+    <!-- 更新现有状态 -->
+    <update id="update">
+        UPDATE ship_runtime_status
+        SET
+            sailing_status = #{sailingStatus},
+            latitude = #{latitude},
+            longitude = #{longitude},
+            speed = #{speed},
+            heading = #{heading},
+            engine_load = #{engineLoad},
+            fuel_percent = #{fuelPercent},
+            weather_id = #{weatherId},
+            last_update = #{lastUpdate}
+        WHERE ship_id = #{shipId}
+    </update>
+
+    <!-- 查询状态 -->
+    <select id="selectByShipId" resultType="shipsensor.entity.ShipRuntimeStatus">
+        SELECT *
+        FROM ship_runtime_status
+        WHERE ship_id = #{shipId}
+    </select>
+
+</mapper>

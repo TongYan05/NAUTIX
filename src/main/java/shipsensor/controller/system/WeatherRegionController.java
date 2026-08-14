@@ -1,4 +1,4 @@
-package shipsensor.controller;
+package shipsensor.controller.system;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

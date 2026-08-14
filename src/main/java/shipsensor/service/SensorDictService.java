@@ -1,4 +1,7 @@
 package shipsensor.service;
 
-public interface SensorDictService {
+import com.baomidou.mybatisplus.extension.service.IService;
+import shipsensor.entity.SensorDict;
+
+public interface SensorDictService extends IService<SensorDict> {
 }
