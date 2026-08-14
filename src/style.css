@@ -1,0 +1,173 @@
+/* ================= NautiX 全局主题样式 ================= */
+
+:root {
+  /* 品牌色板 */
+  --nx-primary: #38bdf8;
+  --nx-cyan: #22d3ee;
+  --nx-blue: #3b82f6;
+  --nx-violet: #a78bfa;
+  --nx-pink: #f472b6;
+  --nx-green: #34d399;
+  --nx-amber: #fbbf24;
+  --nx-red: #fb7185;
+
+  /* 背景与面板 */
+  --nx-bg: #060d1f;
+  --nx-bg-soft: #0a1428;
+  --nx-panel: rgba(13, 26, 51, 0.72);
+  --nx-panel-border: rgba(56, 189, 248, 0.14);
+  --nx-text: #e2e8f0;
+  --nx-text-dim: #a8bdd9;
+
+  /* Element Plus 深色覆盖 */
+  --el-color-primary: #38bdf8;
+  --el-color-success: #34d399;
+  --el-color-warning: #fbbf24;
+  --el-color-danger: #fb7185;
+  --el-color-error: #fb7185;
+  --el-color-info: #8ea3c4;
+
+  --el-bg-color: #0a1428;
+  --el-bg-color-overlay: #101d38;
+  --el-bg-color-page: #060d1f;
+
+  --el-text-color-primary: #e2e8f0;
+  --el-text-color-regular: #c3d0e6;
+  --el-text-color-secondary: #a8bdd9;
+
+  --el-border-color: rgba(148, 184, 232, 0.18);
+  --el-border-color-light: rgba(148, 184, 232, 0.14);
+  --el-border-color-lighter: rgba(148, 184, 232, 0.10);
+
+  --el-fill-color-blank: rgba(10, 20, 40, 0.4);
+  --el-fill-color-light: rgba(30, 48, 82, 0.5);
+  --el-mask-color: rgba(4, 10, 24, 0.75);
+
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--nx-bg);
+  background-image:
+    radial-gradient(1100px 520px at 12% -10%, rgba(56, 189, 248, 0.13), transparent 60%),
+    radial-gradient(900px 480px at 95% 8%, rgba(167, 139, 250, 0.10), transparent 55%),
+    radial-gradient(1000px 600px at 50% 115%, rgba(52, 211, 153, 0.07), transparent 60%),
+    linear-gradient(rgba(56, 189, 248, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.035) 1px, transparent 1px);
+  background-size: auto, auto, auto, 44px 44px, 44px 44px;
+  background-attachment: fixed;
+  color: var(--nx-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- 通用玻璃面板 ---------- */
+.nx-panel {
+  background: var(--nx-panel);
+  border: 1px solid var(--nx-panel-border);
+  border-radius: 14px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 34px rgba(2, 8, 23, 0.45);
+}
+
+.nx-page {
+  padding: 20px 22px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: nx-fade-in 0.35s ease;
+}
+
+.nx-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.nx-page-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #7dd3fc, #a78bfa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.nx-page-desc {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--nx-text-dim);
+}
+
+@keyframes nx-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Element Plus 细节美化 ---------- */
+.el-card {
+  --el-card-bg-color: transparent;
+  border: 1px solid var(--nx-panel-border);
+  background: var(--nx-panel);
+  color: var(--nx-text);
+  border-radius: 14px;
+}
+
+.el-table {
+  --el-table-bg-color: transparent;
+  --el-table-tr-bg-color: transparent;
+  --el-table-header-bg-color: rgba(56, 189, 248, 0.06);
+  --el-table-row-hover-bg-color: rgba(56, 189, 248, 0.08);
+  --el-table-border-color: rgba(148, 184, 232, 0.10);
+  --el-table-text-color: #c3d0e6;
+  --el-table-header-text-color: #7dd3fc;
+}
+
+.el-dialog {
+  border: 1px solid var(--nx-panel-border);
+  border-radius: 14px;
+}
+
+.el-tabs__item.is-active {
+  color: var(--nx-cyan);
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(125, 211, 252, 0.25);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(125, 211, 252, 0.45);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}

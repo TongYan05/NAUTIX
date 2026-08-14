@@ -1,0 +1,34 @@
+<template>
+
+<div class="player">
+
+Replay Player
+
+</div>
+
+</template>
+
+<script setup lang="ts">
+</script>
+
+<style scoped>
+
+.player{
+
+height:450px;
+
+background:#12263d;
+
+border-radius:12px;
+
+color:white;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+}
+
+</style>
