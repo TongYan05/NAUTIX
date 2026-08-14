@@ -1,0 +1,1 @@
+import{n as e}from"./_plugin-vue_export-helper-B3_JWPZy.js";function t(t){return e.get(`/port/page`,{params:t})}function n(){return e.get(`/port/all`)}function r(t){return e.post(`/port`,t)}function i(t){return e.put(`/port`,t)}function a(t){return e.delete(`/port/${t}`)}export{i as a,t as i,a as n,n as r,r as t};
