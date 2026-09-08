@@ -3,36 +3,21 @@ spring:
     name: shipsensor
 
   datasource:
-    url: jdbc:mysql://10.20.102.202:3306/ship_sensor?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
-    username: tongyan
-    password: 2005
+    # 默认连本机 MySQL（当前机器已运行 MySQL80，ship_sensor 库与全部表都在本地）。
+    # 如需连回校园网/实验室的远程库，设置环境变量 DB_URL 即可覆盖，例如：
+    #   DB_URL=jdbc:mysql://10.20.102.202:3306/ship_sensor?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    url: ${DB_URL:jdbc:mysql://localhost:3306/ship_sensor?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&connectTimeout=5000&socketTimeout=60000}
+    username: ${DB_USERNAME:tongyan}
+    password: ${DB_PASSWORD:2005}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-    druid:
-      initial-size: 20
-      min-idle: 20
-      max-active: 200
-      max-wait: 60000
-      filters: stat,wall
-
-      stat-view-servlet:
-        enabled: true
-        url-pattern: /druid/*
-        login-username: admin
-        login-password: admin
-
-
-  redis:
-    host: 172.19.134.209
-    port: 6379
-    password:
-    database: 0
-    timeout: 5000ms
-
-    lettuce:
-      pool:
-        max-active: 20
-        max-idle: 10
+    hikari:
+      # 数据库暂时不可用时不要在建池阶段直接失败，
+      # 避免个别启动初始化查库把整个应用启动带崩
+      initialization-fail-timeout: -1
+      connection-timeout: 5000
+      maximum-pool-size: 50
+      minimum-idle: 5
 
 
   jackson:
