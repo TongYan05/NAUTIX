@@ -2,22 +2,22 @@
   <div class="nx-page">
     <div class="nx-page-header">
       <div>
-        <h2 class="nx-page-title">Operation Logs</h2>
-        <p class="nx-page-desc">Track system data modification history</p>
+        <h2 class="nx-page-title">{{ lang.t('lg.title') }}</h2>
+        <p class="nx-page-desc">{{ lang.t('lg.desc') }}</p>
       </div>
+      <el-button round @click="reload"><el-icon><Refresh /></el-icon>{{ lang.t('common.refresh') }}</el-button>
     </div>
 
     <div class="nx-panel filter-bar">
-      <el-input v-model="filterUser" placeholder="User Name" clearable style="width: 180px" @keyup.enter="reload" @clear="reload" />
-      <el-select v-model="filterTable" placeholder="Target Table" clearable filterable style="width: 220px" @change="reload">
+      <el-input v-model="filterUser" :placeholder="lang.t('lg.userPh')" clearable style="width: 180px" @keyup.enter="reload" @clear="reload" />
+      <el-select v-model="filterTable" :placeholder="lang.t('lg.tablePh')" clearable filterable style="width: 220px" @change="reload">
         <el-option v-for="t in tableOptions" :key="t" :label="t" :value="t" />
       </el-select>
-      <el-button @click="reload"><el-icon><Refresh /></el-icon>Refresh</el-button>
     </div>
 
     <div class="nx-panel table-card">
       <div v-if="!loading && rows.length === 0" class="empty-state">
-        <el-empty description="No operation logs found">
+        <el-empty :description="lang.t('lg.empty')">
           <template #image>
             <el-icon :size="60" color="#9ca3af"><Document /></el-icon>
           </template>
@@ -25,26 +25,26 @@
       </div>
       <template v-else>
         <div class="table-info">
-          <span class="result-count">{{ total }} log entries found</span>
+          <span class="result-count">{{ lang.t('lg.countFound', { n: total }) }}</span>
         </div>
         <el-table v-loading="loading" :data="rows" stripe height="calc(100vh - 320px)">
-        <el-table-column prop="id" label="ID" width="70" />
-        <el-table-column prop="userName" label="User" width="120" />
-        <el-table-column prop="operationType" label="Operation" width="110">
+        <el-table-column prop="id" :label="lang.t('col.id')" width="70" />
+        <el-table-column prop="userName" :label="lang.t('col.userName')" width="120" />
+        <el-table-column prop="operationType" :label="lang.t('col.operation')" width="110">
           <template #default="{ row }">
             <el-tag :type="opTypeTag(row.operationType)" size="small" effect="dark">
               {{ row.operationType || '-' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="targetTable" label="Target Table" width="160" />
-        <el-table-column prop="targetId" label="Target ID" width="90" />
-        <el-table-column prop="oldValue" label="Old Value" min-width="180" show-overflow-tooltip />
-        <el-table-column prop="newValue" label="New Value" min-width="180" show-overflow-tooltip />
-        <el-table-column prop="createTime" label="Timestamp" width="170" />
-        <el-table-column label="Actions" width="90" fixed="right">
+        <el-table-column prop="targetTable" :label="lang.t('col.targetTable')" width="160" />
+        <el-table-column prop="targetId" :label="lang.t('col.targetId')" width="90" />
+        <el-table-column prop="oldValue" :label="lang.t('col.oldValue')" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="newValue" :label="lang.t('col.newValue')" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="createTime" :label="lang.t('col.timestamp')" width="170" />
+        <el-table-column :label="lang.t('common.actions')" width="90" fixed="right">
           <template #default="{ row }">
-            <el-button link type="danger" size="small" @click="confirmDelete(row)">Delete</el-button>
+            <el-button link type="danger" size="small" @click="confirmDelete(row)">{{ lang.t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -69,7 +69,10 @@
 import { computed, onMounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { deleteLog, getLogPage } from '@/api/system'
+import { useLang } from '@/stores/lang'
 import type { SysOperationLog } from '@/api/types'
+
+const lang = useLang()
 
 const loading = ref(false)
 const rows = ref<SysOperationLog[]>([])
@@ -105,7 +108,7 @@ async function reload() {
       if (r.targetTable) tableSet.value.add(r.targetTable)
     }
   } catch {
-    ElMessage.error('Failed to load operation logs. Please check the backend service.')
+    ElMessage.error(lang.t('common.loadFailed'))
   } finally {
     loading.value = false
   }
@@ -113,16 +116,16 @@ async function reload() {
 
 async function confirmDelete(row: SysOperationLog) {
   try {
-    await ElMessageBox.confirm('Are you sure to delete this log entry?', 'Confirm Deletion', { type: 'warning' })
+    await ElMessageBox.confirm(lang.t('lg.deleteConfirm'), lang.t('common.confirmDeletion'), { type: 'warning' })
   } catch {
     return
   }
   try {
     await deleteLog(row.id!)
-    ElMessage.success('Deleted successfully')
+    ElMessage.success(lang.t('common.deleted'))
     reload()
   } catch {
-    ElMessage.error('Delete failed. Please check the backend service.')
+    ElMessage.error(lang.t('common.deleteFailed'))
   }
 }
 

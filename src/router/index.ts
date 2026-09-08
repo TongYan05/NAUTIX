@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { tokenExpired } from '@/api/axios'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -17,79 +18,79 @@ const router = createRouter({
       meta: { title: 'Register', public: true },
     },
 
-    // 受保护路由（需要登录）
+    // 受保护路由（需要登录）；meta.title=英文，meta.titleZh=中文
     { path: '/', redirect: '/dashboard' },
     {
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('@/views/dashboard/Dashboard.vue'),
-      meta: { title: 'Dashboard' },
+      meta: { title: 'Dashboard', titleZh: '仪表盘' },
     },
     {
       path: '/ship',
       name: 'ship',
       component: () => import('@/views/ship/Ship.vue'),
-      meta: { title: 'Ship Management' },
+      meta: { title: 'Ship Management', titleZh: '船舶管理' },
     },
     {
       path: '/sensor/realtime',
       name: 'sensor-realtime',
       component: () => import('@/views/sensor/SensorRealtime.vue'),
-      meta: { title: 'Sensor Realtime Data' },
+      meta: { title: 'Sensor Realtime Data', titleZh: '传感器实时数据' },
     },
     {
       path: '/sensor/config',
       name: 'sensor-config',
       component: () => import('@/views/sensor/SensorConfig.vue'),
-      meta: { title: 'Sensor Configuration' },
+      meta: { title: 'Sensor Configuration', titleZh: '传感器配置' },
     },
     {
       path: '/sensor/dict',
       name: 'sensor-dict',
       component: () => import('@/views/sensor/SensorDictionary.vue'),
-      meta: { title: 'Sensor Dictionary' },
+      meta: { title: 'Sensor Dictionary', titleZh: '传感器字典' },
     },
     {
       path: '/alert/records',
       name: 'alert-records',
       component: () => import('@/views/alert/AlertRecords.vue'),
-      meta: { title: 'Alert Records' },
+      meta: { title: 'Alert Records', titleZh: '告警记录' },
     },
     {
       path: '/alert/rules',
       name: 'alert-rules',
       component: () => import('@/views/alert/AlertRules.vue'),
-      meta: { title: 'Alert Rules' },
+      meta: { title: 'Alert Rules', titleZh: '告警规则' },
     },
     {
       path: '/route',
       name: 'route-manage',
       component: () => import('@/views/route/Route.vue'),
-      meta: { title: 'Route Management' },
+      meta: { title: 'Route Management', titleZh: '航线管理' },
     },
     {
       path: '/port',
       name: 'port',
       component: () => import('@/views/port/Port.vue'),
-      meta: { title: 'Port Management' },
+      meta: { title: 'Port Management', titleZh: '港口管理' },
     },
     {
       path: '/weather',
       name: 'weather',
       component: () => import('@/views/weather/Weather.vue'),
-      meta: { title: 'Weather Monitor' },
+      meta: { title: 'Weather Monitor', titleZh: '天气监测' },
     },
     {
       path: '/analytics',
       name: 'analytics',
       component: () => import('@/views/analytics/Analytics.vue'),
-      meta: { title: 'Analytics Center' },
+      meta: { title: 'Analytics Center', titleZh: '分析中心' },
     },
     {
       path: '/system/logs',
       name: 'system-logs',
       component: () => import('@/views/system/Logs.vue'),
-      meta: { title: 'Operation Logs' },
+      meta: { title: 'Operation Logs', titleZh: '操作日志' },
     },
     { path: '/:pathMatch(.*)*', redirect: '/dashboard' },
   ],
@@ -112,8 +113,11 @@ router.beforeEach((to, _from, next) => {
   }
 
   // 如果是受保护路由，检查是否已登录
-  if (!token) {
-    // 未登录，重定向到登录页，并保存当前路径
+  if (!token || tokenExpired()) {
+    // 未登录或登录已过期，清理失效状态并跳转登录页，
+    // 重新登录后 token 刷新，各页面即可正常加载数据
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
     next({
       path: '/login',
       query: { redirect: to.fullPath }

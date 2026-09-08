@@ -1,18 +1,18 @@
 <template>
-  <div class="dashboard-container">
+  <div class="dashboard-container nx-page">
     <!-- Page Header -->
-    <div class="page-header">
+    <div class="page-header nx-panel">
       <h1 class="page-title">
         <el-icon><DataBoard /></el-icon>
-        Dashboard Overview
+        {{ lang.t('dash.title') }}
       </h1>
       <div class="page-actions">
-        <el-button @click="refreshAll" :loading="isRefreshing">
+        <el-button round @click="refreshAll" :loading="isRefreshing">
           <el-icon><Refresh /></el-icon>
-          Refresh
+          {{ lang.t('common.refresh') }}
         </el-button>
-        <el-tag type="info" effect="dark">
-          Auto-refresh: 30s
+        <el-tag type="info" effect="dark" round>
+          {{ lang.t('dash.autoRefresh') }}
         </el-tag>
       </div>
     </div>
@@ -26,7 +26,7 @@
               <el-icon :size="36"><Ship /></el-icon>
             </div>
             <div class="stats-info">
-              <div class="stats-label">Total Ships</div>
+              <div class="stats-label">{{ lang.t('dash.totalShips') }}</div>
               <div class="stats-value">
                 <el-skeleton v-if="loading.stats" animated style="width: 60px">
                   <template #template>
@@ -46,7 +46,7 @@
               <el-icon :size="36"><Warning /></el-icon>
             </div>
             <div class="stats-info">
-              <div class="stats-label">Active Alerts</div>
+              <div class="stats-label">{{ lang.t('dash.activeAlerts') }}</div>
               <div class="stats-value">
                 <el-skeleton v-if="loading.stats" animated style="width: 60px">
                   <template #template>
@@ -66,7 +66,7 @@
               <el-icon :size="36"><Odometer /></el-icon>
             </div>
             <div class="stats-info">
-              <div class="stats-label">Sensors</div>
+              <div class="stats-label">{{ lang.t('dash.sensors') }}</div>
               <div class="stats-value">
                 <el-skeleton v-if="loading.stats" animated style="width: 60px">
                   <template #template>
@@ -86,7 +86,7 @@
               <el-icon :size="36"><Guide /></el-icon>
             </div>
             <div class="stats-info">
-              <div class="stats-label">Weather Zones</div>
+              <div class="stats-label">{{ lang.t('dash.weatherZones') }}</div>
               <div class="stats-value">
                 <el-skeleton v-if="loading.stats" animated style="width: 60px">
                   <template #template>
@@ -109,9 +109,9 @@
             <div class="card-header">
               <span>
                 <el-icon><TrendCharts /></el-icon>
-                Sensor Data Trend
+                {{ lang.t('dash.sensorTrend') }}
               </span>
-              <el-tag type="primary" size="small" effect="dark">Real-time</el-tag>
+              <el-tag type="primary" size="small" effect="dark">{{ lang.t('dash.realtime') }}</el-tag>
             </div>
           </template>
           <div v-show="loading.trend" class="chart-loading">
@@ -122,7 +122,7 @@
             </el-skeleton>
           </div>
           <div v-show="!loading.trend && trendEmpty" class="chart-empty">
-            <el-empty description="No sensor data available">
+            <el-empty :description="lang.t('dash.noSensorData')">
               <template #image>
                 <el-icon :size="60" color="#9ca3af"><DataLine /></el-icon>
               </template>
@@ -137,9 +137,9 @@
             <div class="card-header">
               <span>
                 <el-icon><PieChart /></el-icon>
-                Alert Status
+                {{ lang.t('dash.alertStatus') }}
               </span>
-              <el-tag type="warning" size="small" effect="dark">Distribution</el-tag>
+              <el-tag type="warning" size="small" effect="dark">{{ lang.t('dash.distribution') }}</el-tag>
             </div>
           </template>
           <div v-show="loading.alert" class="chart-loading">
@@ -150,7 +150,7 @@
             </el-skeleton>
           </div>
           <div v-show="!loading.alert && alertEmpty" class="chart-empty">
-            <el-empty description="No alerts recorded">
+            <el-empty :description="lang.t('dash.noAlerts')">
               <template #image>
                 <el-icon :size="60" color="#9ca3af"><Bell /></el-icon>
               </template>
@@ -169,9 +169,9 @@
             <div class="card-header">
               <span>
                 <el-icon><Histogram /></el-icon>
-                Ship Type Distribution
+                {{ lang.t('dash.shipTypeDist') }}
               </span>
-              <el-tag type="success" size="small" effect="dark">Fleet</el-tag>
+              <el-tag type="success" size="small" effect="dark">{{ lang.t('dash.fleet') }}</el-tag>
             </div>
           </template>
           <div v-show="loading.shipType" class="chart-loading">
@@ -182,7 +182,7 @@
             </el-skeleton>
           </div>
           <div v-show="!loading.shipType && shipTypeEmpty" class="chart-empty">
-            <el-empty description="No ship type data available">
+            <el-empty :description="lang.t('dash.noShipType')">
               <template #image>
                 <el-icon :size="60" color="#9ca3af"><Ship /></el-icon>
               </template>
@@ -197,33 +197,33 @@
             <div class="card-header">
               <span>
                 <el-icon><AlarmClock /></el-icon>
-                Recent Alerts
+                {{ lang.t('dash.recentAlerts') }}
               </span>
-              <el-tag type="danger" size="small" effect="dark">Latest 10</el-tag>
+              <el-tag type="danger" size="small" effect="dark">{{ lang.t('dash.latest10') }}</el-tag>
             </div>
           </template>
           <div v-if="loading.recentAlerts" class="table-loading">
             <el-skeleton animated :rows="5" />
           </div>
           <div v-else-if="recentAlerts.length === 0" class="table-empty">
-            <el-empty description="No recent alerts">
+            <el-empty :description="lang.t('dash.noRecentAlerts')">
               <template #image>
                 <el-icon :size="60" color="#9ca3af"><Check /></el-icon>
               </template>
             </el-empty>
           </div>
           <el-table v-else :data="recentAlerts" size="small" height="280" stripe>
-            <el-table-column prop="shipId" label="Ship ID" width="80" />
-            <el-table-column prop="ruleId" label="Rule ID" width="80" />
-            <el-table-column prop="triggerValue" label="Trigger Value" />
-            <el-table-column label="Status" width="100">
+            <el-table-column prop="shipId" :label="lang.t('col.shipId')" width="80" />
+            <el-table-column prop="ruleId" :label="lang.t('col.ruleId')" width="80" />
+            <el-table-column prop="triggerValue" :label="lang.t('col.triggerValue')" />
+            <el-table-column :label="lang.t('common.status')" width="100">
               <template #default="{ row }">
                 <el-tag :type="row.handleStatus === 1 ? 'success' : 'danger'" size="small">
-                  {{ row.handleStatus === 1 ? 'Handled' : 'Pending' }}
+                  {{ row.handleStatus === 1 ? lang.t('common.handled') : lang.t('common.pending') }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="alertTime" label="Time" width="160" />
+            <el-table-column prop="alertTime" :label="lang.t('col.time')" width="160" />
           </el-table>
         </el-card>
       </el-col>
@@ -232,13 +232,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getDashboardStats, getAlertStatusSummary, getShipTypeDistribution } from '@/api/dashboard'
 import { getSensorTrendData } from '@/api/sensor'
 import { getAlertRecordPage } from '@/api/alert'
 import { useChart } from '@/hooks/useChart'
+import { useLang } from '@/stores/lang'
+import { shipTypeEn } from '@/i18n'
 import type { DashboardStats } from '@/api/dashboard'
+
+const lang = useLang()
 
 const stats = ref<DashboardStats>({
   shipCount: 0,
@@ -271,6 +275,18 @@ const shipTypeBarRef = ref<HTMLElement>()
 const trendChart = useChart(trendChartRef)
 const alertPie = useChart(alertPieRef)
 const shipTypeBar = useChart(shipTypeBarRef)
+
+/* keep latest data so charts can be re-rendered when language switches */
+const trendDataCache = ref<any[]>([])
+const alertDataCache = ref<any[]>([])
+const shipTypeCache = ref<any[]>([])
+
+function typeLabel(zhType: string) {
+  if (lang.lang === 'en') {
+    return shipTypeEn[zhType] || zhType
+  }
+  return zhType
+}
 
 const loadStats = async () => {
   loading.value.stats = true
@@ -310,18 +326,8 @@ function mockShipTypeDist() {
   ]
 }
 
-const loadTrendChart = async () => {
-  loading.value.trend = true
-  let data: any[] = []
-  try {
-    data = await getSensorTrendData(100) || []
-  } catch (e) {
-    console.warn('Trend API failed:', e)
-  }
-  if (data.length === 0) data = mockTrendData()
-  trendEmpty.value = false
-  loading.value.trend = false
-  await nextTick()
+function renderTrend() {
+  const data = trendDataCache.value
   trendChart.setOption({
     tooltip: {
       trigger: 'axis',
@@ -341,7 +347,7 @@ const loadTrendChart = async () => {
       splitLine: { lineStyle: { color: '#374151' } }
     },
     series: [{
-      name: 'Value',
+      name: lang.t('dash.seriesValue'),
       type: 'line',
       data: data.map((item: any) => item.dataValue || 0),
       smooth: true,
@@ -360,18 +366,24 @@ const loadTrendChart = async () => {
   })
 }
 
-const loadAlertPie = async () => {
-  loading.value.alert = true
+const loadTrendChart = async () => {
+  loading.value.trend = true
   let data: any[] = []
   try {
-    data = await getAlertStatusSummary() || []
+    data = await getSensorTrendData(100) || []
   } catch (e) {
-    console.warn('Alert API failed:', e)
+    console.warn('Trend API failed:', e)
   }
-  if (data.length === 0) data = mockAlertSummary()
-  alertEmpty.value = false
-  loading.value.alert = false
+  if (data.length === 0) data = mockTrendData()
+  trendEmpty.value = false
+  loading.value.trend = false
+  trendDataCache.value = data
   await nextTick()
+  renderTrend()
+}
+
+function renderAlertPie() {
+  const data = alertDataCache.value
   alertPie.setOption({
     tooltip: { trigger: 'item' },
     legend: {
@@ -383,7 +395,7 @@ const loadAlertPie = async () => {
       type: 'pie',
       radius: '60%',
       data: data.map((item: any) => ({
-        name: item.handleStatus === 0 ? 'Pending' : 'Handled',
+        name: item.handleStatus === 0 ? lang.t('common.pending') : lang.t('common.handled'),
         value: item.count
       })),
       emphasis: {
@@ -391,6 +403,57 @@ const loadAlertPie = async () => {
           shadowBlur: 10,
           shadowOffsetX: 0,
           shadowColor: 'rgba(0, 0, 0, 0.5)'
+        }
+      }
+    }]
+  })
+}
+
+const loadAlertPie = async () => {
+  loading.value.alert = true
+  let data: any[] = []
+  try {
+    data = await getAlertStatusSummary() || []
+  } catch (e) {
+    console.warn('Alert API failed:', e)
+  }
+  if (data.length === 0) data = mockAlertSummary()
+  alertEmpty.value = false
+  loading.value.alert = false
+  alertDataCache.value = data
+  await nextTick()
+  renderAlertPie()
+}
+
+function renderShipTypeBar() {
+  const data = shipTypeCache.value
+  shipTypeBar.setOption({
+    tooltip: { trigger: 'axis' },
+    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    xAxis: {
+      type: 'category',
+      data: data.map((item: any) => typeLabel(item.shipType || '')),
+      axisLine: { lineStyle: { color: '#374151' } },
+      axisLabel: { color: '#9ca3af', rotate: 30 }
+    },
+    yAxis: {
+      type: 'value',
+      axisLine: { lineStyle: { color: '#374151' } },
+      axisLabel: { color: '#9ca3af' },
+      splitLine: { lineStyle: { color: '#374151' } }
+    },
+    series: [{
+      name: lang.t('dash.seriesAlerts'),
+      type: 'bar',
+      data: data.map((item: any) => item.count || 0),
+      itemStyle: {
+        color: {
+          type: 'linear',
+          x: 0, y: 0, x2: 0, y2: 1,
+          colorStops: [
+            { offset: 0, color: '#3b82f6' },
+            { offset: 1, color: '#60a5fa' }
+          ]
         }
       }
     }]
@@ -408,37 +471,9 @@ const loadShipTypeBar = async () => {
   if (data.length === 0) data = mockShipTypeDist()
   shipTypeEmpty.value = false
   loading.value.shipType = false
+  shipTypeCache.value = data
   await nextTick()
-  shipTypeBar.setOption({
-    tooltip: { trigger: 'axis' },
-    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
-    xAxis: {
-      type: 'category',
-      data: data.map((item: any) => item.shipType || ''),
-      axisLine: { lineStyle: { color: '#374151' } },
-      axisLabel: { color: '#9ca3af', rotate: 30 }
-    },
-    yAxis: {
-      type: 'value',
-      axisLine: { lineStyle: { color: '#374151' } },
-      axisLabel: { color: '#9ca3af' },
-      splitLine: { lineStyle: { color: '#374151' } }
-    },
-    series: [{
-      type: 'bar',
-      data: data.map((item: any) => item.count || 0),
-      itemStyle: {
-        color: {
-          type: 'linear',
-          x: 0, y: 0, x2: 0, y2: 1,
-          colorStops: [
-            { offset: 0, color: '#3b82f6' },
-            { offset: 1, color: '#60a5fa' }
-          ]
-        }
-      }
-    }]
-  })
+  renderShipTypeBar()
 }
 
 const loadRecentAlerts = async () => {
@@ -455,8 +490,8 @@ const loadRecentAlerts = async () => {
 
 const refreshAll = async () => {
   isRefreshing.value = true
-  ElMessage.info('Refreshing dashboard data...')
-  
+  ElMessage.info(lang.t('dash.refreshing'))
+
   try {
     await Promise.all([
       loadStats(),
@@ -465,19 +500,26 @@ const refreshAll = async () => {
       loadShipTypeBar(),
       loadRecentAlerts()
     ])
-    ElMessage.success('Dashboard refreshed successfully')
+    ElMessage.success(lang.t('dash.refreshOk'))
   } catch (error) {
-    ElMessage.error('Failed to refresh dashboard')
+    ElMessage.error(lang.t('dash.refreshFailed'))
   } finally {
     isRefreshing.value = false
   }
 }
 
+// 语言切换：图表内文字（图例/系列名/船型名）本地化重绘，无需重新请求
+watch(() => lang.lang, () => {
+  renderTrend()
+  renderAlertPie()
+  renderShipTypeBar()
+})
+
 let refreshInterval: number
 
 onMounted(() => {
   refreshAll()
-  
+
   refreshInterval = window.setInterval(() => {
     loadStats()
     loadTrendChart()
@@ -500,10 +542,7 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-  border-radius: 12px;
-  border: 1px solid #4b5563;
+  padding: 18px 22px;
 }
 
 .page-title {
@@ -532,15 +571,13 @@ onUnmounted(() => {
 }
 
 .stats-card {
-  background-color: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 12px;
+  border-radius: 14px;
   transition: all 0.3s ease;
 }
 
 .stats-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 12px 28px rgba(2, 8, 23, 0.55);
 }
 
 .stats-card :deep(.el-card__body) {
@@ -565,23 +602,27 @@ onUnmounted(() => {
 
 /* Color themes for stats cards */
 .stats-card-blue .stats-icon {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
-  color: #3b82f6;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(59, 130, 246, 0.08) 100%);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.25);
 }
 
 .stats-card-red .stats-icon {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.1) 100%);
-  color: #ef4444;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(239, 68, 68, 0.08) 100%);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.25);
 }
 
 .stats-card-green .stats-icon {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%);
-  color: #10b981;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(16, 185, 129, 0.08) 100%);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.25);
 }
 
 .stats-card-yellow .stats-icon {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.1) 100%);
-  color: #f59e0b;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0.08) 100%);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.25);
 }
 
 .stats-info {
@@ -590,25 +631,25 @@ onUnmounted(() => {
 }
 
 .stats-label {
-  font-size: 14px;
-  color: #9ca3af;
+  font-size: 13px;
+  color: #94a3b8;
   margin-bottom: 8px;
-  font-weight: 500;
-  text-transform: uppercase;
+  font-weight: 600;
   letter-spacing: 0.5px;
 }
 
 .stats-value {
   font-size: 32px;
-  font-weight: 700;
+  font-weight: 800;
   color: #f9fafb;
   line-height: 1;
   display: flex;
   align-items: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .stats-value span {
-  background: linear-gradient(135deg, #f9fafb 0%, #d1d5db 100%);
+  background: linear-gradient(135deg, #f9fafb 0%, #cbd5e1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -620,16 +661,14 @@ onUnmounted(() => {
 }
 
 .chart-card {
-  background-color: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 12px;
+  border-radius: 14px;
   height: 100%;
 }
 
 .chart-card :deep(.el-card__header) {
-  border-bottom: 1px solid #4b5563;
-  padding: 18px 24px;
-  background: linear-gradient(135deg, rgba(55, 65, 81, 0.3) 0%, rgba(31, 41, 55, 0.3) 100%);
+  border-bottom: 1px solid rgba(148, 184, 232, 0.10);
+  padding: 16px 22px;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.05), transparent);
 }
 
 .card-header {
@@ -642,9 +681,9 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #f9fafb;
+  color: #e2e8f0;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .card-header .el-icon {
@@ -673,30 +712,6 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
-}
-
-/* Tables */
-.el-table {
-  background-color: transparent;
-}
-
-.el-table th {
-  background-color: #374151 !important;
-  color: #f3f4f6;
-  font-weight: 600;
-}
-
-.el-table td {
-  background-color: transparent !important;
-  color: #d1d5db;
-}
-
-.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
-  background-color: rgba(55, 65, 81, 0.3) !important;
-}
-
-.el-table__body tr:hover > td.el-table__cell {
-  background-color: rgba(59, 130, 246, 0.1) !important;
 }
 
 /* Responsive */

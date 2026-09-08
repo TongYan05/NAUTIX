@@ -2,22 +2,22 @@
   <div class="nx-page">
     <div class="nx-page-header">
       <div>
-        <h2 class="nx-page-title">Sensor Dictionary</h2>
-        <p class="nx-page-desc">Define sensor type codes, default units and descriptions</p>
+        <h2 class="nx-page-title">{{ lang.t('sd.title') }}</h2>
+        <p class="nx-page-desc">{{ lang.t('sd.desc') }}</p>
       </div>
-      <el-button type="primary" @click="openCreate"><el-icon><Plus /></el-icon>Add Type</el-button>
+      <el-button type="primary" round @click="openCreate"><el-icon><Plus /></el-icon>{{ lang.t('sd.add') }}</el-button>
     </div>
 
     <div class="nx-panel filter-bar">
-      <el-input v-model="keyword" placeholder="Search type name / code" clearable style="width: 280px" @keyup.enter="reload" @clear="reload">
+      <el-input v-model="keyword" :placeholder="lang.t('sd.search')" clearable style="width: 280px" @keyup.enter="reload" @clear="reload">
         <template #prefix><el-icon><Search /></el-icon></template>
       </el-input>
-      <el-button @click="reload"><el-icon><Refresh /></el-icon>Refresh</el-button>
-      <span class="result-count">{{ total }} sensor types found</span>
+      <el-button round @click="reload"><el-icon><Refresh /></el-icon>{{ lang.t('common.refresh') }}</el-button>
+      <span class="result-count">{{ lang.t('sd.countFound', { n: total }) }}</span>
     </div>
 
     <div v-loading="loading" class="dict-wrap">
-      <el-empty v-if="!loading && rows.length === 0" description="No sensor types found">
+      <el-empty v-if="!loading && rows.length === 0" :description="lang.t('sd.empty')">
         <template #image>
           <el-icon :size="60" color="#9ca3af"><Collection /></el-icon>
         </template>
@@ -28,20 +28,20 @@
           <div class="dict-head">
             <div class="dict-icon"><el-icon :size="22"><Odometer /></el-icon></div>
             <div class="dict-title">
-              <span class="dict-name">{{ row.typeName || '-' }}</span>
+              <span class="dict-name">{{ typeNameOf(row) }}</span>
               <el-tag size="small" effect="dark" type="primary">{{ row.typeCode }}</el-tag>
             </div>
           </div>
           <div class="dict-unit">
             <span class="unit-value">{{ row.defaultUnit || '—' }}</span>
-            <span class="unit-label">Default Unit</span>
+            <span class="unit-label">{{ lang.t('sd.defaultUnit') }}</span>
           </div>
-          <p class="dict-desc">{{ row.description || 'No description provided.' }}</p>
+          <p class="dict-desc">{{ row.description || lang.t('sd.noDesc') }}</p>
           <div class="dict-foot">
             <span class="dict-id">#{{ row.id }}</span>
             <span class="dict-actions">
-              <el-button link type="primary" size="small" @click="openEdit(row)">Edit</el-button>
-              <el-button link type="danger" size="small" @click="confirmDelete(row)">Delete</el-button>
+              <el-button link type="primary" size="small" @click="openEdit(row)">{{ lang.t('common.edit') }}</el-button>
+              <el-button link type="danger" size="small" @click="confirmDelete(row)">{{ lang.t('common.delete') }}</el-button>
             </span>
           </div>
         </div>
@@ -60,24 +60,24 @@
       </div>
     </div>
 
-    <el-dialog v-model="dialogVisible" :title="editing ? 'Edit Type' : 'Add Type'" width="500px" destroy-on-close>
+    <el-dialog v-model="dialogVisible" :title="editing ? lang.t('sd.editTitle') : lang.t('sd.add')" width="500px" destroy-on-close>
       <el-form :model="form" label-width="100px">
-        <el-form-item label="Type Code" required>
-          <el-input v-model="form.typeCode" placeholder="e.g. TEMP_EXHAUST" />
+        <el-form-item :label="lang.t('sd.typeCode')" required>
+          <el-input v-model="form.typeCode" :placeholder="lang.t('sd.codePh')" />
         </el-form-item>
-        <el-form-item label="Type Name" required>
-          <el-input v-model="form.typeName" placeholder="e.g. Exhaust Temperature" />
+        <el-form-item :label="lang.t('sd.typeName')" required>
+          <el-input v-model="form.typeName" :placeholder="lang.t('sd.namePh')" />
         </el-form-item>
-        <el-form-item label="Default Unit">
-          <el-input v-model="form.defaultUnit" placeholder="e.g. ℃ / kn / bar" />
+        <el-form-item :label="lang.t('sd.defaultUnit')">
+          <el-input v-model="form.defaultUnit" :placeholder="lang.t('sd.unitPh')" />
         </el-form-item>
-        <el-form-item label="Description">
+        <el-form-item :label="lang.t('col.description')">
           <el-input v-model="form.description" type="textarea" :rows="3" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" :loading="saving" @click="save">Save</el-button>
+        <el-button round @click="dialogVisible = false">{{ lang.t('common.cancel') }}</el-button>
+        <el-button type="primary" round :loading="saving" @click="save">{{ lang.t('common.save') }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -92,7 +92,11 @@ import {
   getSensorDictPage,
   updateSensorDict,
 } from '@/api/sensor'
+import { useLang } from '@/stores/lang'
+import { sensorTypeEn } from '@/i18n'
 import type { SensorDict } from '@/api/types'
+
+const lang = useLang()
 
 const loading = ref(false)
 const saving = ref(false)
@@ -106,6 +110,14 @@ const dialogVisible = ref(false)
 const editing = ref(false)
 const form = ref<SensorDict>({})
 
+// 英文模式下按 typeCode 翻译成英文名；中文模式直接用库中 typeName
+function typeNameOf(row: SensorDict) {
+  if (lang.lang === 'en' && row.typeCode && sensorTypeEn[row.typeCode]) {
+    return sensorTypeEn[row.typeCode]
+  }
+  return row.typeName || '-'
+}
+
 async function reload() {
   loading.value = true
   try {
@@ -117,7 +129,7 @@ async function reload() {
     rows.value = res?.records || []
     total.value = res?.total || 0
   } catch {
-    ElMessage.error('Failed to load sensor dictionary. Please check the backend service.')
+    ElMessage.error(lang.t('common.loadFailed'))
   } finally {
     loading.value = false
   }
@@ -137,22 +149,22 @@ function openEdit(row: SensorDict) {
 
 async function save() {
   if (!form.value.typeCode?.trim() || !form.value.typeName?.trim()) {
-    ElMessage.warning('Type code and name are required')
+    ElMessage.warning(lang.t('sd.codeRequired'))
     return
   }
   saving.value = true
   try {
     if (editing.value) {
       await updateSensorDict(form.value)
-      ElMessage.success('Updated successfully')
+      ElMessage.success(lang.t('common.updated'))
     } else {
       await addSensorDict(form.value)
-      ElMessage.success('Created successfully')
+      ElMessage.success(lang.t('common.created'))
     }
     dialogVisible.value = false
     reload()
   } catch {
-    ElMessage.error('Save failed. Please check the backend service.')
+    ElMessage.error(lang.t('common.saveFailed'))
   } finally {
     saving.value = false
   }
@@ -160,16 +172,16 @@ async function save() {
 
 async function confirmDelete(row: SensorDict) {
   try {
-    await ElMessageBox.confirm(`Are you sure to delete type "${row.typeName}"?`, 'Confirm Deletion', { type: 'warning' })
+    await ElMessageBox.confirm(lang.t('sd.deleteConfirm', { name: row.typeName || '' }), lang.t('common.confirmDeletion'), { type: 'warning' })
   } catch {
     return
   }
   try {
     await deleteSensorDict(row.id!)
-    ElMessage.success('Deleted successfully')
+    ElMessage.success(lang.t('common.deleted'))
     reload()
   } catch {
-    ElMessage.error('Delete failed. Please check the backend service.')
+    ElMessage.error(lang.t('common.deleteFailed'))
   }
 }
 

@@ -2,36 +2,36 @@
   <div class="nx-page">
     <div class="nx-page-header">
       <div>
-        <h2 class="nx-page-title">Sensor Configuration</h2>
-        <p class="nx-page-desc">Manage sensors installed on each vessel and their operational status</p>
+        <h2 class="nx-page-title">{{ lang.t('sc.title') }}</h2>
+        <p class="nx-page-desc">{{ lang.t('sc.desc') }}</p>
       </div>
-      <el-button type="primary" @click="openCreate"><el-icon><Plus /></el-icon>Add Configuration</el-button>
+      <el-button type="primary" round @click="openCreate"><el-icon><Plus /></el-icon>{{ lang.t('sc.add') }}</el-button>
     </div>
 
     <div class="nx-panel filter-bar">
       <el-select-v2
         v-model="filterShipId"
         :options="shipOptions"
-        placeholder="Select Ship"
+        :placeholder="lang.t('sr.selectShip')"
         clearable
         filterable
         style="width: 200px"
         @change="reload"
       />
-      <el-select v-model="filterTypeId" placeholder="Sensor Type" clearable filterable style="width: 170px" @change="reload">
-        <el-option v-for="d in dictOptions" :key="d.id" :label="d.typeName || ''" :value="d.id as number" />
+      <el-select v-model="filterTypeId" :placeholder="lang.t('col.sensorType')" clearable filterable style="width: 170px" @change="reload">
+        <el-option v-for="d in dictOptions" :key="d.id" :label="dictLabel(d)" :value="d.id as number" />
       </el-select>
-      <el-select v-model="filterStatus" placeholder="Status" clearable style="width: 130px" @change="reload">
-        <el-option label="Enabled" :value="1" />
-        <el-option label="Disabled" :value="0" />
+      <el-select v-model="filterStatus" :placeholder="lang.t('sc.statusLabel')" clearable style="width: 130px" @change="reload">
+        <el-option :label="lang.t('common.enabled')" :value="1" />
+        <el-option :label="lang.t('common.disabled')" :value="0" />
       </el-select>
-      <el-input v-model="filterName" placeholder="Sensor Name" clearable style="width: 200px" @keyup.enter="reload" @clear="reload" />
-      <el-button @click="reload"><el-icon><Refresh /></el-icon>Refresh</el-button>
+      <el-input v-model="filterName" :placeholder="lang.t('col.sensorName')" clearable style="width: 200px" @keyup.enter="reload" @clear="reload" />
+      <el-button round @click="reload"><el-icon><Refresh /></el-icon>{{ lang.t('common.refresh') }}</el-button>
     </div>
 
     <div class="nx-panel table-card">
       <div v-if="!loading && rows.length === 0" class="empty-state">
-        <el-empty description="No sensor configurations found">
+        <el-empty :description="lang.t('sc.empty')">
           <template #image>
             <el-icon :size="60" color="#9ca3af"><Odometer /></el-icon>
           </template>
@@ -39,33 +39,33 @@
       </div>
       <template v-else>
         <div class="table-info">
-          <span class="result-count">{{ total }} sensor configurations found</span>
+          <span class="result-count">{{ lang.t('sc.countFound', { n: total }) }}</span>
         </div>
         <el-table v-loading="loading" :data="rows" stripe height="calc(100vh - 340px)">
-        <el-table-column prop="id" label="ID" width="70" />
-        <el-table-column prop="shipId" label="Ship" width="130">
+        <el-table-column prop="id" :label="lang.t('col.id')" width="70" />
+        <el-table-column prop="shipId" :label="lang.t('col.ship')" width="130">
           <template #default="{ row }">
             <el-tag size="small" effect="plain">{{ shipNameOf(row.shipId) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="sensorName" label="Sensor Name" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="typeId" label="Type" width="120">
+        <el-table-column prop="sensorName" :label="lang.t('col.sensorName')" min-width="160" show-overflow-tooltip />
+        <el-table-column prop="typeId" :label="lang.t('common.type')" width="120">
           <template #default="{ row }">
             <el-tag size="small" type="info" effect="plain">{{ dictNameOf(row.typeId) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="installDate" label="Install Date" width="120" />
-        <el-table-column label="Status" width="100">
+        <el-table-column prop="installDate" :label="lang.t('col.installDate')" width="120" />
+        <el-table-column :label="lang.t('common.status')" width="100">
           <template #default="{ row }">
             <el-tag :type="row.status === 1 ? 'success' : 'danger'" effect="dark" size="small">
-              {{ row.status === 1 ? 'Enabled' : 'Disabled' }}
+              {{ row.status === 1 ? lang.t('common.enabledTag') : lang.t('common.disabledTag') }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="Actions" width="140" fixed="right">
+        <el-table-column :label="lang.t('common.actions')" width="140" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="openEdit(row)">Edit</el-button>
-            <el-button link type="danger" size="small" @click="confirmDelete(row)">Delete</el-button>
+            <el-button link type="primary" size="small" @click="openEdit(row)">{{ lang.t('common.edit') }}</el-button>
+            <el-button link type="danger" size="small" @click="confirmDelete(row)">{{ lang.t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -84,35 +84,35 @@
       </template>
     </div>
 
-    <el-dialog v-model="dialogVisible" :title="editing ? 'Edit Configuration' : 'Add Configuration'" width="520px" destroy-on-close>
+    <el-dialog v-model="dialogVisible" :title="editing ? lang.t('sc.editTitle') : lang.t('sc.add')" width="520px" destroy-on-close>
       <el-form :model="form" label-width="110px">
-        <el-form-item label="Ship" required>
+        <el-form-item :label="lang.t('col.ship')" required>
           <el-select-v2
             v-model="form.shipId"
             :options="shipOptions"
-            placeholder="Select Ship"
+            :placeholder="lang.t('sr.selectShip')"
             filterable
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item label="Sensor Name" required>
-          <el-input v-model="form.sensorName" placeholder="e.g. Exhaust Temperature Sensor" />
+        <el-form-item :label="lang.t('col.sensorName')" required>
+          <el-input v-model="form.sensorName" :placeholder="lang.t('sc.namePh')" />
         </el-form-item>
-        <el-form-item label="Sensor Type">
-          <el-select v-model="form.typeId" placeholder="Select Type" style="width: 100%">
-            <el-option v-for="d in dictOptions" :key="d.id" :label="d.typeName" :value="d.id" />
+        <el-form-item :label="lang.t('col.sensorType')">
+          <el-select v-model="form.typeId" :placeholder="lang.t('sc.selectType')" style="width: 100%">
+            <el-option v-for="d in dictOptions" :key="d.id" :label="dictLabel(d)" :value="d.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Install Date">
+        <el-form-item :label="lang.t('col.installDate')">
           <el-date-picker v-model="form.installDate" type="date" value-format="YYYY-MM-DD" style="width: 100%" />
         </el-form-item>
-        <el-form-item label="Status">
-          <el-switch v-model="form.status" :active-value="1" :inactive-value="0" active-text="Enabled" inactive-text="Disabled" />
+        <el-form-item :label="lang.t('common.status')">
+          <el-switch v-model="form.status" :active-value="1" :inactive-value="0" :active-text="lang.t('common.enabled')" :inactive-text="lang.t('common.disabled')" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" :loading="saving" @click="save">Save</el-button>
+        <el-button round @click="dialogVisible = false">{{ lang.t('common.cancel') }}</el-button>
+        <el-button type="primary" round :loading="saving" @click="save">{{ lang.t('common.save') }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -129,8 +129,11 @@ import {
   getAllSensorDicts,
 } from '@/api/sensor'
 import { useShipStore } from '@/stores/shipStore'
+import { useLang } from '@/stores/lang'
+import { sensorTypeEn } from '@/i18n'
 import type { SensorConfig, SensorDict } from '@/api/types'
 
+const lang = useLang()
 const loading = ref(false)
 const saving = ref(false)
 const rows = ref<SensorConfig[]>([])
@@ -156,10 +159,19 @@ const form = ref<SensorConfig>({ status: 1 })
 const dictOptions = ref<SensorDict[]>([])
 
 const dictMap = computed(() => {
-  const m = new Map<number, string>()
-  for (const d of dictOptions.value) if (d.id != null) m.set(d.id, d.typeName || `#${d.id}`)
+  const m = new Map<number, SensorDict>()
+  for (const d of dictOptions.value) if (d.id != null) m.set(d.id, d)
   return m
 })
+
+// 字典 typeName 存中文，英文模式按 typeCode 翻译成通用英文名
+function dictLabel(d?: SensorDict) {
+  if (!d) return '-'
+  if (lang.lang === 'en' && d.typeCode && sensorTypeEn[d.typeCode]) {
+    return sensorTypeEn[d.typeCode]
+  }
+  return d.typeName || '-'
+}
 
 function shipNameOf(id?: number) {
   if (id == null) return '-'
@@ -167,7 +179,8 @@ function shipNameOf(id?: number) {
 }
 function dictNameOf(id?: number) {
   if (id == null) return '-'
-  return dictMap.value.get(id) || `#${id}`
+  const d = dictMap.value.get(id)
+  return d ? dictLabel(d) : `#${id}`
 }
 
 async function loadOptions() {
@@ -194,7 +207,7 @@ async function reload() {
     rows.value = res?.records || []
     total.value = res?.total || 0
   } catch {
-    ElMessage.error('Failed to load sensor configuration. Please check the backend service.')
+    ElMessage.error(lang.t('common.loadFailed'))
   } finally {
     loading.value = false
   }
@@ -214,22 +227,22 @@ function openEdit(row: SensorConfig) {
 
 async function save() {
   if (form.value.shipId == null || !form.value.sensorName?.trim()) {
-    ElMessage.warning('Please select a ship and enter a sensor name')
+    ElMessage.warning(lang.t('sc.selectShipRequired'))
     return
   }
   saving.value = true
   try {
     if (editing.value) {
       await updateSensorConfig(form.value)
-      ElMessage.success('Updated successfully')
+      ElMessage.success(lang.t('common.updated'))
     } else {
       await addSensorConfig(form.value)
-      ElMessage.success('Created successfully')
+      ElMessage.success(lang.t('common.created'))
     }
     dialogVisible.value = false
     reload()
   } catch {
-    ElMessage.error('Save failed. Please check the backend service.')
+    ElMessage.error(lang.t('common.saveFailed'))
   } finally {
     saving.value = false
   }
@@ -237,16 +250,16 @@ async function save() {
 
 async function confirmDelete(row: SensorConfig) {
   try {
-    await ElMessageBox.confirm(`Are you sure to delete sensor "${row.sensorName}"?`, 'Confirm Deletion', { type: 'warning' })
+    await ElMessageBox.confirm(lang.t('sc.deleteConfirm', { name: row.sensorName || '' }), lang.t('common.confirmDeletion'), { type: 'warning' })
   } catch {
     return
   }
   try {
     await deleteSensorConfig(row.id!)
-    ElMessage.success('Deleted successfully')
+    ElMessage.success(lang.t('common.deleted'))
     reload()
   } catch {
-    ElMessage.error('Delete failed. Please check the backend service.')
+    ElMessage.error(lang.t('common.deleteFailed'))
   }
 }
 

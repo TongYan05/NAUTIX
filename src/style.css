@@ -171,3 +171,167 @@ body {
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* ================= 全站视觉升级（追加层） ================= */
+
+/* ---------- 文字与选区 ---------- */
+::selection {
+  background: rgba(56, 189, 248, 0.35);
+  color: #f0f9ff;
+}
+
+/* ---------- 页面头：细渐变分隔 ---------- */
+.nx-page-header {
+  padding-bottom: 14px;
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, rgba(56, 189, 248, 0.35), rgba(167, 139, 250, 0.25), transparent) 1;
+}
+
+/* ---------- 按钮：主按钮品牌渐变 + 微动效 ---------- */
+.el-button--primary {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb 70%, #4f46e5);
+  border: none;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  transition: all 0.2s ease;
+}
+.el-button--primary:hover,
+.el-button--primary:focus {
+  background: linear-gradient(135deg, #38bdf8, #3b82f6 70%, #6366f1);
+  box-shadow: 0 6px 20px rgba(56, 189, 248, 0.45);
+  transform: translateY(-1px);
+}
+.el-button--primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+.el-button.is-round {
+  letter-spacing: 0.3px;
+}
+.el-button:not(.el-button--primary):not(.is-link):hover {
+  transform: translateY(-1px);
+}
+
+/* ---------- 输入类控件：focus 辉光 ---------- */
+.el-input__wrapper,
+.el-textarea__inner,
+.el-select__wrapper {
+  border-radius: 10px;
+  background: rgba(9, 18, 36, 0.6);
+  box-shadow: 0 0 0 1px rgba(148, 184, 232, 0.16) inset;
+  transition: box-shadow 0.2s ease;
+}
+.el-input__wrapper.is-focus,
+.el-select__wrapper.is-focused,
+.el-textarea__inner:focus {
+  box-shadow:
+    0 0 0 1px rgba(56, 189, 248, 0.65) inset,
+    0 0 14px rgba(56, 189, 248, 0.18);
+}
+.el-input__wrapper:hover,
+.el-select__wrapper:hover {
+  box-shadow: 0 0 0 1px rgba(125, 211, 252, 0.4) inset;
+}
+
+/* ---------- 表格：圆角、表头、行悬停 ---------- */
+.el-table {
+  border-radius: 10px;
+}
+.el-table th.el-table__cell {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.10), rgba(56, 189, 248, 0.03)) !important;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+.el-table__row {
+  transition: background 0.15s ease;
+}
+.el-table__body tr:hover > td.el-table__cell {
+  background: rgba(56, 189, 248, 0.07) !important;
+}
+
+/* ---------- 分页：激活胶囊 ---------- */
+.el-pagination.is-background .el-pager li.is-active,
+.el-pager li.is-active {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb) !important;
+  color: #fff !important;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.45);
+}
+.el-pagination button:hover,
+.el-pager li:hover {
+  color: #7dd3fc !important;
+}
+
+/* ---------- 对话框：头部光带 + 遮罩景深 ---------- */
+.el-dialog {
+  background: linear-gradient(180deg, rgba(16, 29, 56, 0.98), rgba(10, 20, 40, 0.98));
+  box-shadow: 0 24px 70px rgba(2, 8, 23, 0.7);
+}
+.el-dialog__header {
+  position: relative;
+  margin-right: 0;
+}
+.el-dialog__header::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.5), rgba(167, 139, 250, 0.4), transparent);
+}
+.el-dialog__title {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.el-overlay {
+  backdrop-filter: blur(3px);
+}
+
+/* ---------- 下拉与弹出层 ---------- */
+.el-popper.is-light,
+.el-popper.is-pure {
+  border-radius: 10px;
+}
+.el-select-dropdown__item.is-selected {
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+/* ---------- 标签与骨架屏 ---------- */
+.el-tag {
+  border-radius: 8px;
+}
+.el-skeleton__item {
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.08), rgba(56, 189, 248, 0.16), rgba(56, 189, 248, 0.08));
+}
+
+/* ---------- 消息提示：玻璃化 ---------- */
+.el-message {
+  backdrop-filter: blur(10px);
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(2, 8, 23, 0.5);
+}
+.el-message-box {
+  border: 1px solid var(--nx-panel-border);
+  border-radius: 14px;
+}
+
+/* ---------- 空状态与面板统一 ---------- */
+.el-empty__description p {
+  color: var(--nx-text-dim);
+}
+.nx-panel:hover {
+  border-color: rgba(56, 189, 248, 0.22);
+  transition: border-color 0.25s ease;
+}
+
+/* ---------- 日期选择器深色一致性 ---------- */
+.el-picker-panel,
+.el-date-range-picker {
+  background: var(--el-bg-color-overlay);
+  border: 1px solid var(--nx-panel-border);
+  border-radius: 12px;
+}
+.el-date-table td.current:not(.disabled) .el-date-table-cell__text {
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+}

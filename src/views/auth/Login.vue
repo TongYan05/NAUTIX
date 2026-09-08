@@ -141,7 +141,7 @@
         <div class="panel-header">
           <div class="logo-circle">⚓</div>
           <h1 class="panel-title">NautiX</h1>
-          <p class="panel-subtitle">MARITIME SENSING PLATFORM</p>
+          <p class="panel-subtitle">{{ lang.t('auth.subtitle') }}</p>
         </div>
 
         <el-form
@@ -154,7 +154,7 @@
           <el-form-item prop="username">
             <el-input
               v-model="loginForm.username"
-              placeholder="Username"
+              :placeholder="lang.t('auth.username')"
               size="large"
               :prefix-icon="User"
             />
@@ -164,7 +164,7 @@
             <el-input
               v-model="loginForm.password"
               type="password"
-              placeholder="Password"
+              :placeholder="lang.t('auth.password')"
               size="large"
               :prefix-icon="Lock"
               show-password
@@ -180,13 +180,13 @@
               class="login-btn"
               @click="handleLogin"
             >
-              {{ loading ? 'Setting Sail...' : 'Set Sail' }}
+              {{ loading ? lang.t('auth.logging') : lang.t('auth.login') }}
             </el-button>
           </el-form-item>
 
           <div class="register-link">
-            Don't have an account?
-            <router-link to="/register">Register now</router-link>
+            {{ lang.t('auth.noAccount') }}
+            <router-link to="/register">{{ lang.t('auth.registerNow') }}</router-link>
           </div>
         </el-form>
       </div>
@@ -195,12 +195,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { User, Lock } from '@element-plus/icons-vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
+import { useLang } from '@/stores/lang'
 
 const authStore = useAuthStore()
+const lang = useLang()
 const loginFormRef = ref<FormInstance>()
 const loading = ref(false)
 
@@ -209,16 +211,16 @@ const loginForm = reactive({
   password: ''
 })
 
-const loginRules: FormRules = {
+const loginRules = computed<FormRules>(() => ({
   username: [
-    { required: true, message: 'Please enter username', trigger: 'blur' },
-    { min: 3, message: 'Username must be at least 3 characters', trigger: 'blur' }
+    { required: true, message: lang.t('auth.userRequired'), trigger: 'blur' },
+    { min: 3, message: lang.t('auth.userMin'), trigger: 'blur' }
   ],
   password: [
-    { required: true, message: 'Please enter password', trigger: 'blur' },
-    { min: 6, message: 'Password must be at least 6 characters', trigger: 'blur' }
+    { required: true, message: lang.t('auth.passRequired'), trigger: 'blur' },
+    { min: 6, message: lang.t('auth.passMin'), trigger: 'blur' }
   ]
-}
+}))
 
 const handleLogin = async () => {
   if (!loginFormRef.value) return
@@ -230,9 +232,9 @@ const handleLogin = async () => {
       loading.value = false
 
       if (result.success) {
-        ElMessage.success(result.message)
+        ElMessage.success(lang.t('auth.loginOk'))
       } else {
-        ElMessage.error(result.message)
+        ElMessage.error(lang.t('auth.loginFailed'))
       }
     }
   })

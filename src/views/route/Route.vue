@@ -2,20 +2,20 @@
   <div class="nx-page">
     <div class="nx-page-header">
       <div>
-        <h2 class="nx-page-title">Route Management</h2>
-        <p class="nx-page-desc">Maintain inter-port shipping routes and navigation distances</p>
+        <h2 class="nx-page-title">{{ lang.t('route.title') }}</h2>
+        <p class="nx-page-desc">{{ lang.t('route.desc') }}</p>
       </div>
-      <el-button type="primary" @click="openCreate"><el-icon><Plus /></el-icon>Add Route</el-button>
+      <el-button type="primary" round @click="openCreate"><el-icon><Plus /></el-icon>{{ lang.t('route.add') }}</el-button>
     </div>
 
     <div class="nx-panel filter-bar">
-      <el-input v-model="keyword" placeholder="Search route name" clearable style="width: 240px" @keyup.enter="reload" @clear="reload">
+      <el-input v-model="keyword" :placeholder="lang.t('route.search')" clearable style="width: 240px" @keyup.enter="reload" @clear="reload">
         <template #prefix><el-icon><Search /></el-icon></template>
       </el-input>
       <el-select-v2
         v-model="filterStartPortId"
         :options="portSelectOptions"
-        placeholder="Origin Port"
+        :placeholder="lang.t('route.originPh')"
         clearable
         filterable
         style="width: 200px"
@@ -24,50 +24,48 @@
       <el-select-v2
         v-model="filterEndPortId"
         :options="portSelectOptions"
-        placeholder="Destination Port"
+        :placeholder="lang.t('route.destPh')"
         clearable
         filterable
         style="width: 200px"
         @change="reload"
       />
-      <el-button @click="reload"><el-icon><Refresh /></el-icon>Refresh</el-button>
+      <el-button round @click="reload"><el-icon><Refresh /></el-icon>{{ lang.t('common.refresh') }}</el-button>
+      <span class="result-count">{{ lang.t('route.countFound', { n: total }) }}</span>
     </div>
 
     <div class="nx-panel table-card">
       <template v-if="!loading && rows.length === 0">
-        <el-empty description="No routes found">
+        <el-empty :description="lang.t('route.empty')">
           <template #image>
             <el-icon :size="60" color="#9ca3af"><Promotion /></el-icon>
           </template>
         </el-empty>
       </template>
       <template v-else>
-        <div class="table-info">
-          <span class="result-count">{{ total }} routes found</span>
-        </div>
         <el-table v-loading="loading" :data="rows" stripe height="calc(100vh - 330px)">
-        <el-table-column prop="id" label="ID" width="70" />
-        <el-table-column prop="routeName" label="Route Name" min-width="180" show-overflow-tooltip />
-        <el-table-column label="Origin Port" min-width="140">
+        <el-table-column prop="id" :label="lang.t('col.id')" width="70" />
+        <el-table-column prop="routeName" :label="lang.t('col.routeName')" min-width="180" show-overflow-tooltip />
+        <el-table-column :label="lang.t('col.originPort')" min-width="140">
           <template #default="{ row }">
             <el-tag size="small" effect="plain" type="success">{{ portNameOf(row.startPortId) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="Destination Port" min-width="140">
+        <el-table-column :label="lang.t('col.destPort')" min-width="140">
           <template #default="{ row }">
             <el-tag size="small" effect="plain" type="warning">{{ portNameOf(row.endPortId) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="Distance (nm)" width="120">
+        <el-table-column :label="lang.t('col.distanceNm')" width="120">
           <template #default="{ row }">
             <span class="dist-value">{{ row.distanceNm }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="description" label="Description" min-width="160" show-overflow-tooltip />
-        <el-table-column label="Actions" width="140" fixed="right">
+        <el-table-column prop="description" :label="lang.t('col.description')" min-width="160" show-overflow-tooltip />
+        <el-table-column :label="lang.t('common.actions')" width="140" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="openEdit(row)">Edit</el-button>
-            <el-button link type="danger" size="small" @click="confirmDelete(row)">Delete</el-button>
+            <el-button link type="primary" size="small" @click="openEdit(row)">{{ lang.t('common.edit') }}</el-button>
+            <el-button link type="danger" size="small" @click="confirmDelete(row)">{{ lang.t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -86,39 +84,39 @@
       </template>
     </div>
 
-    <el-dialog v-model="dialogVisible" :title="editing ? 'Edit Route' : 'Add Route'" width="520px" destroy-on-close>
+    <el-dialog v-model="dialogVisible" :title="editing ? lang.t('route.editTitle') : lang.t('route.add')" width="520px" destroy-on-close>
       <el-form :model="form" label-width="110px">
-        <el-form-item label="Route Name" required>
-          <el-input v-model="form.routeName" placeholder="e.g. Shanghai to Singapore" />
+        <el-form-item :label="lang.t('col.routeName')" required>
+          <el-input v-model="form.routeName" :placeholder="lang.t('route.namePh')" />
         </el-form-item>
-        <el-form-item label="Origin Port">
+        <el-form-item :label="lang.t('col.originPort')">
           <el-select-v2
             v-model="form.startPortId"
             :options="portSelectOptions"
-            placeholder="Select origin port"
+            :placeholder="lang.t('route.selectOrigin')"
             filterable
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item label="Dest. Port">
+        <el-form-item :label="lang.t('col.destPort')">
           <el-select-v2
             v-model="form.endPortId"
             :options="portSelectOptions"
-            placeholder="Select destination port"
+            :placeholder="lang.t('route.selectDest')"
             filterable
             style="width: 100%"
           />
         </el-form-item>
-        <el-form-item label="Distance (nm)">
+        <el-form-item :label="lang.t('col.distanceNm')">
           <el-input-number v-model="form.distanceNm" :min="0" :precision="1" style="width: 100%" />
         </el-form-item>
-        <el-form-item label="Description">
+        <el-form-item :label="lang.t('col.description')">
           <el-input v-model="form.description" type="textarea" :rows="2" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" :loading="saving" @click="save">Save</el-button>
+        <el-button round @click="dialogVisible = false">{{ lang.t('common.cancel') }}</el-button>
+        <el-button type="primary" round :loading="saving" @click="save">{{ lang.t('common.save') }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -129,7 +127,10 @@ import { computed, onMounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { addRoute, deleteRoute, getRoutePage, updateRoute } from '@/api/ship'
 import { getAllPorts } from '@/api/port'
+import { useLang } from '@/stores/lang'
 import type { Port, Route } from '@/api/types'
+
+const lang = useLang()
 
 const loading = ref(false)
 const saving = ref(false)
@@ -183,7 +184,7 @@ async function reload() {
     rows.value = res?.records || []
     total.value = res?.total || 0
   } catch {
-    ElMessage.error('Failed to load route data. Please check the backend service.')
+    ElMessage.error(lang.t('common.loadFailed'))
   } finally {
     loading.value = false
   }
@@ -203,22 +204,22 @@ function openEdit(row: Route) {
 
 async function save() {
   if (!form.value.routeName?.trim()) {
-    ElMessage.warning('Route name is required')
+    ElMessage.warning(lang.t('route.nameRequired'))
     return
   }
   saving.value = true
   try {
     if (editing.value) {
       await updateRoute(form.value)
-      ElMessage.success('Updated successfully')
+      ElMessage.success(lang.t('common.updated'))
     } else {
       await addRoute(form.value)
-      ElMessage.success('Created successfully')
+      ElMessage.success(lang.t('common.created'))
     }
     dialogVisible.value = false
     reload()
   } catch {
-    ElMessage.error('Save failed. Please check the backend service.')
+    ElMessage.error(lang.t('common.saveFailed'))
   } finally {
     saving.value = false
   }
@@ -226,16 +227,16 @@ async function save() {
 
 async function confirmDelete(row: Route) {
   try {
-    await ElMessageBox.confirm(`Are you sure to delete route "${row.routeName}"?`, 'Confirm Deletion', { type: 'warning' })
+    await ElMessageBox.confirm(lang.t('route.deleteConfirm', { name: row.routeName || '' }), lang.t('common.confirmDeletion'), { type: 'warning' })
   } catch {
     return
   }
   try {
     await deleteRoute(row.id!)
-    ElMessage.success('Deleted successfully')
+    ElMessage.success(lang.t('common.deleted'))
     reload()
   } catch {
-    ElMessage.error('Delete failed. Please check the backend service.')
+    ElMessage.error(lang.t('common.deleteFailed'))
   }
 }
 
@@ -247,9 +248,8 @@ onMounted(() => {
 
 <style scoped>
 .filter-bar { display: flex; gap: 10px; padding: 14px 16px; align-items: center; }
+.result-count { margin-left: auto; font-size: 14px; color: #9ca3af; font-weight: 500; }
 .table-card { padding: 10px 14px 14px; }
-.table-info { padding: 12px 0; display: flex; align-items: center; }
-.result-count { font-size: 14px; color: #9ca3af; font-weight: 500; }
 .pager { display: flex; justify-content: flex-end; margin-top: 12px; }
 .dist-value { color: #38bdf8; font-weight: 700; font-variant-numeric: tabular-nums; }
 </style>

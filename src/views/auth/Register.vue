@@ -77,7 +77,7 @@
         <div class="panel-header">
           <div class="logo-circle">⚓</div>
           <h1 class="panel-title">NautiX</h1>
-          <p class="panel-subtitle">JOIN THE CREW</p>
+          <p class="panel-subtitle">{{ lang.t('auth.joinSubtitle') }}</p>
         </div>
 
         <el-form
@@ -88,25 +88,25 @@
           @submit.prevent="handleRegister"
         >
           <el-form-item prop="username">
-            <el-input v-model="registerForm.username" placeholder="Username" size="large" :prefix-icon="User" />
+            <el-input v-model="registerForm.username" :placeholder="lang.t('auth.username')" size="large" :prefix-icon="User" />
           </el-form-item>
           <el-form-item prop="nickname">
-            <el-input v-model="registerForm.nickname" placeholder="Nickname (Optional)" size="large" :prefix-icon="UserFilled" />
+            <el-input v-model="registerForm.nickname" :placeholder="lang.t('auth.nicknamePh')" size="large" :prefix-icon="UserFilled" />
           </el-form-item>
           <el-form-item prop="password">
-            <el-input v-model="registerForm.password" type="password" placeholder="Password" size="large" :prefix-icon="Lock" show-password />
+            <el-input v-model="registerForm.password" type="password" :placeholder="lang.t('auth.password')" size="large" :prefix-icon="Lock" show-password />
           </el-form-item>
           <el-form-item prop="confirmPassword">
-            <el-input v-model="registerForm.confirmPassword" type="password" placeholder="Confirm Password" size="large" :prefix-icon="Lock" show-password @keyup.enter="handleRegister" />
+            <el-input v-model="registerForm.confirmPassword" type="password" :placeholder="lang.t('auth.confirmPassword')" size="large" :prefix-icon="Lock" show-password @keyup.enter="handleRegister" />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" size="large" :loading="loading" class="register-btn" @click="handleRegister">
-              {{ loading ? 'Joining...' : 'Join the Crew' }}
+              {{ loading ? lang.t('auth.registering') : lang.t('auth.register') }}
             </el-button>
           </el-form-item>
           <div class="login-link">
-            Already have an account?
-            <router-link to="/login">Login now</router-link>
+            {{ lang.t('auth.haveAccount') }}
+            <router-link to="/login">{{ lang.t('auth.backLogin') }}</router-link>
           </div>
         </el-form>
       </div>
@@ -115,39 +115,42 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { User, UserFilled, Lock } from '@element-plus/icons-vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useAuthStore } from '@/stores/auth'
+import { useLang } from '@/stores/lang'
 import router from '@/router'
 
 const authStore = useAuthStore()
+const lang = useLang()
 const registerFormRef = ref<FormInstance>()
 const loading = ref(false)
 
 const registerForm = reactive({ username: '', nickname: '', password: '', confirmPassword: '' })
 
-const validateConfirmPassword = (_rule: any, value: string, callback: any) => {
-  if (value !== registerForm.password) callback(new Error('Passwords do not match'))
-  else callback()
-}
-
-const registerRules: FormRules = {
+const registerRules = computed<FormRules>(() => ({
   username: [
-    { required: true, message: 'Please enter username', trigger: 'blur' },
-    { min: 3, max: 20, message: 'Username must be 3-20 characters', trigger: 'blur' },
-    { pattern: /^[a-zA-Z0-9_]+$/, message: 'Only letters, numbers and underscores', trigger: 'blur' }
+    { required: true, message: lang.t('auth.userRequired'), trigger: 'blur' },
+    { min: 3, max: 20, message: lang.t('auth.userLen'), trigger: 'blur' },
+    { pattern: /^[a-zA-Z0-9_]+$/, message: lang.t('auth.userPattern'), trigger: 'blur' }
   ],
-  nickname: [{ max: 30, message: 'Nickname cannot exceed 30 characters', trigger: 'blur' }],
+  nickname: [{ max: 30, message: lang.t('auth.nickLen'), trigger: 'blur' }],
   password: [
-    { required: true, message: 'Please enter password', trigger: 'blur' },
-    { min: 6, message: 'Password must be at least 6 characters', trigger: 'blur' }
+    { required: true, message: lang.t('auth.passRequired'), trigger: 'blur' },
+    { min: 6, message: lang.t('auth.passMin'), trigger: 'blur' }
   ],
   confirmPassword: [
-    { required: true, message: 'Please confirm password', trigger: 'blur' },
-    { validator: validateConfirmPassword, trigger: 'blur' }
+    { required: true, message: lang.t('auth.confirmRequired'), trigger: 'blur' },
+    {
+      validator: (_rule: any, value: string, callback: any) => {
+        if (value !== registerForm.password) callback(new Error(lang.t('auth.pwMismatch')))
+        else callback()
+      },
+      trigger: 'blur'
+    }
   ]
-}
+}))
 
 const handleRegister = async () => {
   if (!registerFormRef.value) return
@@ -156,8 +159,12 @@ const handleRegister = async () => {
       loading.value = true
       const result = await authStore.register(registerForm.username, registerForm.password, registerForm.nickname || undefined)
       loading.value = false
-      if (result.success) { ElMessage.success(result.message); router.push('/login') }
-      else ElMessage.error(result.message)
+      if (result.success) {
+        ElMessage.success(lang.t('auth.registerOk'))
+        router.push('/login')
+      } else {
+        ElMessage.error(lang.t('auth.registerFailed'))
+      }
     }
   })
 }

@@ -3,14 +3,14 @@
     <div class="nx-page-header">
       <div>
         <h2 class="nx-page-title">
-          Sensor Realtime Data
-          <span v-if="autoRefresh" class="live-badge"><span class="live-dot"></span>LIVE</span>
+          {{ lang.t('sr.title') }}
+          <span v-if="autoRefresh" class="live-badge"><span class="live-dot"></span>{{ lang.t('sr.live') }}</span>
         </h2>
-        <p class="nx-page-desc">Live streaming sensor readings — auto refreshes every 10 seconds</p>
+        <p class="nx-page-desc">{{ lang.t('sr.desc') }}</p>
       </div>
       <el-switch
         v-model="autoRefresh"
-        active-text="Auto Refresh"
+        :active-text="lang.t('sr.autoRefresh')"
         inline-prompt
         style="--el-switch-on-color: #10b981"
       />
@@ -20,7 +20,7 @@
       <el-select-v2
         v-model="filterShipId"
         :options="shipOptions"
-        placeholder="Select Ship"
+        :placeholder="lang.t('sr.selectShip')"
         clearable
         filterable
         style="width: 220px"
@@ -29,21 +29,21 @@
       <el-date-picker
         v-model="timeRange"
         type="datetimerange"
-        range-separator="to"
-        start-placeholder="Start Time"
-        end-placeholder="End Time"
+        :range-separator="lang.lang === 'zh' ? '至' : 'to'"
+        :start-placeholder="lang.t('sr.startTime')"
+        :end-placeholder="lang.t('sr.endTime')"
         value-format="YYYY-MM-DD HH:mm:ss"
         @change="reload"
       />
       <el-select v-model="size" style="width: 130px" @change="reload">
-        <el-option :label="'20 per page'" :value="20" />
-        <el-option :label="'50 per page'" :value="50" />
-        <el-option :label="'100 per page'" :value="100" />
+        <el-option :label="lang.t('sr.perPage', { n: 20 })" :value="20" />
+        <el-option :label="lang.t('sr.perPage', { n: 50 })" :value="50" />
+        <el-option :label="lang.t('sr.perPage', { n: 100 })" :value="100" />
       </el-select>
-      <el-button type="primary" @click="reload">
-        <el-icon><Refresh /></el-icon>Query
+      <el-button type="primary" round @click="reload">
+        <el-icon><Refresh /></el-icon>{{ lang.t('common.query') }}
       </el-button>
-      <span v-if="lastRefreshAt" class="last-refresh">Last update: {{ lastRefreshAt }}</span>
+      <span v-if="lastRefreshAt" class="last-refresh">{{ lang.t('sr.lastUpdate', { t: lastRefreshAt }) }}</span>
     </div>
 
     <div class="stat-grid">
@@ -54,25 +54,25 @@
     </div>
 
     <div class="nx-panel chart-card">
-      <div class="card-title"><el-icon><TrendCharts /></el-icon>Value Trend (Current Query)</div>
+      <div class="card-title"><el-icon><TrendCharts /></el-icon>{{ lang.t('sr.trend') }}</div>
       <div ref="chartEl" class="chart-box" />
     </div>
 
     <div class="nx-panel table-card">
       <el-table v-loading="loading" :data="rows" stripe height="380">
-        <el-table-column prop="id" label="ID" width="90" />
-        <el-table-column prop="shipId" label="Ship ID" width="90">
+        <el-table-column prop="id" :label="lang.t('col.id')" width="90" />
+        <el-table-column prop="shipId" :label="lang.t('col.shipId')" width="90">
           <template #default="{ row }">
             <el-tag size="small" effect="plain">{{ shipNameOf(row.shipId) }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="configId" label="Config ID" width="90" />
-        <el-table-column prop="dataValue" label="Value" width="120">
+        <el-table-column prop="configId" :label="lang.t('col.configId')" width="90" />
+        <el-table-column prop="dataValue" :label="lang.t('common.value')" width="120">
           <template #default="{ row }">
             <span class="value-text">{{ row.dataValue?.toFixed(3) }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="recordedAt" label="Recorded At" min-width="170" />
+        <el-table-column prop="recordedAt" :label="lang.t('col.recordedAt')" min-width="170" />
       </el-table>
 
       <div class="pager">
@@ -94,8 +94,10 @@ import { ElMessage } from 'element-plus'
 import { getSensorDataPage } from '@/api/sensor'
 import { useShipStore } from '@/stores/shipStore'
 import { useChart, chartTheme } from '@/hooks/useChart'
+import { useLang } from '@/stores/lang'
 import type { SensorData } from '@/api/types'
 
+const lang = useLang()
 const shipStore = useShipStore()
 
 const shipOptions = computed(() =>
@@ -125,20 +127,20 @@ const summary = computed(() => {
   const values = rows.value.map(r => r.dataValue).filter((v): v is number => v != null)
   if (values.length === 0) {
     return [
-      { label: 'Records', value: 0, color: '#38bdf8' },
-      { label: 'Max', value: '-', color: '#fbbf24' },
-      { label: 'Min', value: '-', color: '#34d399' },
-      { label: 'Average', value: '-', color: '#a78bfa' },
+      { label: lang.t('sr.records'), value: 0, color: '#38bdf8' },
+      { label: lang.t('sr.max'), value: '-', color: '#fbbf24' },
+      { label: lang.t('sr.min'), value: '-', color: '#34d399' },
+      { label: lang.t('sr.average'), value: '-', color: '#a78bfa' },
     ]
   }
   const max = Math.max(...values)
   const min = Math.min(...values)
   const avg = values.reduce((a, b) => a + b, 0) / values.length
   return [
-    { label: 'Records', value: values.length, color: '#38bdf8' },
-    { label: 'Max', value: max.toFixed(3), color: '#fbbf24' },
-    { label: 'Min', value: min.toFixed(3), color: '#34d399' },
-    { label: 'Average', value: avg.toFixed(3), color: '#a78bfa' },
+    { label: lang.t('sr.records'), value: values.length, color: '#38bdf8' },
+    { label: lang.t('sr.max'), value: max.toFixed(3), color: '#fbbf24' },
+    { label: lang.t('sr.min'), value: min.toFixed(3), color: '#34d399' },
+    { label: lang.t('sr.average'), value: avg.toFixed(3), color: '#a78bfa' },
   ]
 })
 
@@ -162,7 +164,7 @@ async function reload(silent = false) {
     lastRefreshAt.value = fmt(new Date())
     renderChart()
   } catch {
-    if (!silent) ElMessage.error('Failed to load sensor data. Please check the backend service.')
+    if (!silent) ElMessage.error(lang.t('common.loadFailed'))
   } finally {
     loading.value = false
   }
@@ -208,6 +210,8 @@ function renderChart() {
     ],
   })
 }
+
+// 图表本身无语言相关文字，切换语言仅影响表头，由 computed 自动更新
 
 let autoTimer: number | undefined
 
@@ -285,7 +289,9 @@ onUnmounted(() => {
 .stat-card {
   padding: 14px 18px;
   text-align: center;
+  transition: transform 0.2s ease;
 }
+.stat-card:hover { transform: translateY(-3px); }
 
 .stat-label {
   font-size: 12px;

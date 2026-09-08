@@ -2,30 +2,30 @@
   <div class="nx-page">
     <div class="nx-page-header">
       <div>
-        <h2 class="nx-page-title">Weather Monitor</h2>
-        <p class="nx-page-desc">Real-time environmental parameters for maritime weather regions</p>
+        <h2 class="nx-page-title">{{ lang.t('we.title') }}</h2>
+        <p class="nx-page-desc">{{ lang.t('we.desc') }}</p>
       </div>
-      <el-button @click="reload"><el-icon><Refresh /></el-icon>Refresh</el-button>
+      <el-button round @click="reload"><el-icon><Refresh /></el-icon>{{ lang.t('common.refresh') }}</el-button>
     </div>
 
-    <el-empty v-if="!loading && regions.length === 0" description="No weather data available. Please check the backend service." />
+    <el-empty v-if="!loading && regions.length === 0" :description="lang.t('we.empty')" />
 
     <div v-loading="loading" class="weather-grid">
       <div v-for="r in visibleRegions" :key="r.id" class="weather-card nx-panel">
         <div class="weather-head">
           <el-icon :size="22" color="#38bdf8"><Cloudy /></el-icon>
-          <div class="region-name">{{ r.regionName || `Region ${r.id}` }}</div>
-          <el-tag size="small" effect="dark" round>{{ r.weatherType || 'Unknown' }}</el-tag>
+          <div class="region-name">{{ r.regionName || lang.t('we.region', { id: r.id ?? '' }) }}</div>
+          <el-tag size="small" effect="dark" round :type="weatherTagType(r.weatherType)">{{ weatherLabel(r.weatherType) }}</el-tag>
         </div>
 
         <div class="temp-row">
           <div class="temp-block">
             <div class="temp-value hot">{{ formatNum(r.airTemperature) }}°</div>
-            <div class="temp-label">Air Temp</div>
+            <div class="temp-label">{{ lang.t('we.airTemp') }}</div>
           </div>
           <div class="temp-block">
             <div class="temp-value cool">{{ formatNum(r.seaTemperature) }}°</div>
-            <div class="temp-label">Sea Temp</div>
+            <div class="temp-label">{{ lang.t('we.seaTemp') }}</div>
           </div>
         </div>
 
@@ -33,40 +33,40 @@
           <div class="metric">
             <el-icon><WindPower /></el-icon>
             <span>{{ formatNum(r.windSpeed) }} m/s</span>
-            <em>Wind Speed</em>
+            <em>{{ lang.t('we.windSpeed') }}</em>
           </div>
           <div class="metric">
             <el-icon><Position /></el-icon>
             <span>{{ formatNum(r.windDirection) }}°</span>
-            <em>Wind Dir</em>
+            <em>{{ lang.t('we.windDir') }}</em>
           </div>
           <div class="metric">
             <el-icon><Drizzling /></el-icon>
             <span>{{ formatNum(r.humidity) }}%</span>
-            <em>Humidity</em>
+            <em>{{ lang.t('we.humidity') }}</em>
           </div>
           <div class="metric">
             <el-icon><Stopwatch /></el-icon>
             <span>{{ formatNum(r.pressure) }} hPa</span>
-            <em>Pressure</em>
+            <em>{{ lang.t('we.pressure') }}</em>
           </div>
           <div class="metric">
             <el-icon><MagicStick /></el-icon>
             <span>{{ formatNum(r.waveHeight) }} m</span>
-            <em>Wave Height</em>
+            <em>{{ lang.t('we.waveHeight') }}</em>
           </div>
         </div>
 
-        <div class="update-time">Updated: {{ r.updateTime || '-' }}</div>
+        <div class="update-time">{{ lang.t('we.updated', { t: r.updateTime || '-' }) }}</div>
       </div>
     </div>
 
     <div ref="sentinelRef" class="load-sentinel">
       <span v-if="!loading && visibleRegions.length < regions.length" class="load-hint">
-        Showing {{ visibleRegions.length }} of {{ regions.length }} regions — scroll to load more
+        {{ lang.t('we.showing', { n: visibleRegions.length, total: regions.length }) }}
       </span>
       <span v-else-if="!loading && regions.length > 0" class="load-hint">
-        All {{ regions.length }} regions loaded
+        {{ lang.t('we.allLoaded', { n: regions.length }) }}
       </span>
     </div>
   </div>
@@ -76,7 +76,11 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getAllWeatherRegions } from '@/api/weather'
+import { useLang } from '@/stores/lang'
+import { weatherTypes } from '@/i18n'
 import type { WeatherRegion } from '@/api/types'
+
+const lang = useLang()
 
 const loading = ref(false)
 const regions = ref<WeatherRegion[]>([])
@@ -88,6 +92,21 @@ const visibleRegions = computed(() => regions.value.slice(0, visibleCount.value)
 
 const sentinelRef = ref<HTMLElement>()
 let observer: IntersectionObserver | null = null
+
+function weatherLabel(code?: string) {
+  if (!code) return lang.t('common.unknown')
+  const entry = weatherTypes[code]
+  if (!entry) return code
+  return lang.lang === 'zh' ? entry.zh : entry.en
+}
+
+function weatherTagType(code?: string) {
+  if (!code) return 'info'
+  if (['TYPHOON', 'HURRICANE', 'CYCLONE', 'TROPICAL_STORM', 'STORM', 'EXTREME_WEATHER', 'VERY_HIGH_WAVE', 'LIGHTNING_STORM', 'THUNDERSTORM'].includes(code)) return 'danger'
+  if (['ROUGH_SEA', 'HIGH_WAVE', 'SEA_FOG', 'FREEZING_FOG', 'FOG', 'GALE', 'STORM_FORCE_WIND', 'STRONG_WIND', 'SAND_STORM', 'ICE_WARNING', 'LOW_VISIBILITY'].includes(code)) return 'warning'
+  if (['SUNNY', 'CLEAR'].includes(code)) return 'success'
+  return 'info'
+}
 
 function loadMore() {
   if (visibleCount.value < regions.value.length) {
@@ -105,7 +124,7 @@ async function reload() {
     regions.value = (await getAllWeatherRegions()) || []
     visibleCount.value = BATCH
   } catch {
-    ElMessage.error('Failed to load weather data. Please check the backend service.')
+    ElMessage.error(lang.t('common.loadFailed'))
   } finally {
     loading.value = false
   }

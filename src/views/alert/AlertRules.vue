@@ -2,24 +2,24 @@
   <div class="nx-page">
     <div class="nx-page-header">
       <div>
-        <h2 class="nx-page-title">Alert Rules</h2>
-        <p class="nx-page-desc">Configure sensor alert thresholds, operators and severity levels</p>
+        <h2 class="nx-page-title">{{ lang.t('arl.title') }}</h2>
+        <p class="nx-page-desc">{{ lang.t('arl.desc') }}</p>
       </div>
-      <el-button type="primary" @click="openCreate"><el-icon><Plus /></el-icon>Add Rule</el-button>
+      <el-button type="primary" round @click="openCreate"><el-icon><Plus /></el-icon>{{ lang.t('arl.add') }}</el-button>
     </div>
 
     <div class="nx-panel filter-bar">
-      <el-input v-model="filterName" placeholder="Rule Name" clearable style="width: 240px" @keyup.enter="reload" @clear="reload">
+      <el-input v-model="filterName" :placeholder="lang.t('arl.search')" clearable style="width: 240px" @keyup.enter="reload" @clear="reload">
         <template #prefix><el-icon><Search /></el-icon></template>
       </el-input>
-      <el-select v-model="filterLevel" placeholder="Alert Level" clearable style="width: 140px" @change="reload">
-        <el-option label="Low" :value="1" />
-        <el-option label="Medium" :value="2" />
-        <el-option label="High" :value="3" />
-        <el-option label="Critical" :value="4" />
+      <el-select v-model="filterLevel" :placeholder="lang.t('arl.level')" clearable style="width: 140px" @change="reload">
+        <el-option :label="lang.t('arl.low')" :value="1" />
+        <el-option :label="lang.t('arl.medium')" :value="2" />
+        <el-option :label="lang.t('arl.high')" :value="3" />
+        <el-option :label="lang.t('arl.critical')" :value="4" />
       </el-select>
-      <el-button @click="reload"><el-icon><Refresh /></el-icon>Refresh</el-button>
-      <span class="result-count">{{ total }} alert rules found</span>
+      <el-button round @click="reload"><el-icon><Refresh /></el-icon>{{ lang.t('common.refresh') }}</el-button>
+      <span class="result-count">{{ lang.t('arl.countFound', { n: total }) }}</span>
     </div>
 
     <div class="stat-grid">
@@ -27,41 +27,41 @@
         <div class="stat-icon" style="color:#38bdf8;background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.25)"><el-icon :size="20"><Files /></el-icon></div>
         <div class="stat-body">
           <div class="stat-value" style="color:#38bdf8">{{ statsTotal }}</div>
-          <div class="stat-label">Total Rules</div>
+          <div class="stat-label">{{ lang.t('arl.totalRules') }}</div>
         </div>
       </div>
       <div class="stat-card nx-panel">
         <div class="stat-icon" style="color:#ef4444;background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.25)"><el-icon :size="20"><WarnTriangleFilled /></el-icon></div>
         <div class="stat-body">
           <div class="stat-value" style="color:#ef4444">{{ statsCritical }}</div>
-          <div class="stat-label">Critical</div>
+          <div class="stat-label">{{ lang.t('arl.critical') }}</div>
         </div>
       </div>
       <div class="stat-card nx-panel">
         <div class="stat-icon" style="color:#f56c6c;background:rgba(245,108,108,.12);border-color:rgba(245,108,108,.25)"><el-icon :size="20"><BellFilled /></el-icon></div>
         <div class="stat-body">
           <div class="stat-value" style="color:#f56c6c">{{ statsHigh }}</div>
-          <div class="stat-label">High</div>
+          <div class="stat-label">{{ lang.t('arl.high') }}</div>
         </div>
       </div>
       <div class="stat-card nx-panel">
         <div class="stat-icon" style="color:#e6a23c;background:rgba(230,162,60,.12);border-color:rgba(230,162,60,.25)"><el-icon :size="20"><WarningFilled /></el-icon></div>
         <div class="stat-body">
           <div class="stat-value" style="color:#e6a23c">{{ statsMediumLow }}</div>
-          <div class="stat-label">Medium / Low</div>
+          <div class="stat-label">{{ lang.t('arl.mediumLow') }}</div>
         </div>
       </div>
       <div class="stat-card nx-panel">
         <div class="stat-icon" style="color:#a78bfa;background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.25)"><el-icon :size="20"><Odometer /></el-icon></div>
         <div class="stat-body">
           <div class="stat-value" style="color:#a78bfa">{{ statsTypes }}</div>
-          <div class="stat-label">Sensor Types Covered</div>
+          <div class="stat-label">{{ lang.t('arl.typesCovered') }}</div>
         </div>
       </div>
     </div>
 
     <div v-loading="loading" class="carousel-wrap">
-      <el-empty v-if="!loading && rows.length === 0" description="No alert rules found">
+      <el-empty v-if="!loading && rows.length === 0" :description="lang.t('arl.empty')">
         <template #image>
           <el-icon :size="60" color="#9ca3af"><Setting /></el-icon>
         </template>
@@ -87,13 +87,13 @@
             <div class="rule-type"><el-tag size="small" effect="plain">{{ dictNameOf(row.typeId) }}</el-tag></div>
             <div class="rule-cond">
               <span class="cond-text">{{ operatorText(row.operator) }} {{ row.thresholdValue }}</span>
-              <span class="cond-label">Trigger Condition</span>
+              <span class="cond-label">{{ lang.t('arl.triggerCond') }}</span>
             </div>
             <div class="rule-foot">
               <span class="rule-duration"><el-icon :size="13"><Timer /></el-icon>{{ row.durationSeconds }}s</span>
               <span class="rule-actions">
-                <el-button link type="primary" size="small" @click="openEdit(row)">Edit</el-button>
-                <el-button link type="danger" size="small" @click="confirmDelete(row)">Delete</el-button>
+                <el-button link type="primary" size="small" @click="openEdit(row)">{{ lang.t('common.edit') }}</el-button>
+                <el-button link type="danger" size="small" @click="confirmDelete(row)">{{ lang.t('common.delete') }}</el-button>
               </span>
             </div>
           </div>
@@ -117,43 +117,43 @@
       </div>
     </div>
 
-    <el-dialog v-model="dialogVisible" :title="editing ? 'Edit Rule' : 'Add Rule'" width="520px" destroy-on-close>
+    <el-dialog v-model="dialogVisible" :title="editing ? lang.t('arl.editTitle') : lang.t('arl.add')" width="520px" destroy-on-close>
       <el-form :model="form" label-width="110px">
-        <el-form-item label="Rule Name" required>
-          <el-input v-model="form.ruleName" placeholder="e.g. High Exhaust Temp" />
+        <el-form-item :label="lang.t('arl.search')" required>
+          <el-input v-model="form.ruleName" :placeholder="lang.t('arl.namePh')" />
         </el-form-item>
-        <el-form-item label="Sensor Type">
-          <el-select v-model="form.typeId" placeholder="Select Type" style="width: 100%">
-            <el-option v-for="d in dictOptions" :key="d.id" :label="d.typeName" :value="d.id" />
+        <el-form-item :label="lang.t('col.sensorType')">
+          <el-select v-model="form.typeId" :placeholder="lang.t('sc.selectType')" style="width: 100%">
+            <el-option v-for="d in dictOptions" :key="d.id" :label="dictLabel(d)" :value="d.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Operator">
+        <el-form-item :label="lang.t('arl.operator')">
           <el-select v-model="form.operator" style="width: 100%">
-            <el-option label="Greater than (>)" value=">" />
-            <el-option label="Greater or equal (>=)" value=">=" />
-            <el-option label="Less than (<)" value="<" />
-            <el-option label="Less or equal (<=)" value="<=" />
-            <el-option label="Equal (=)" value="=" />
+            <el-option :label="lang.t('arl.opGt')" value=">" />
+            <el-option :label="lang.t('arl.opGe')" value=">=" />
+            <el-option :label="lang.t('arl.opLt')" value="<" />
+            <el-option :label="lang.t('arl.opLe')" value="<=" />
+            <el-option :label="lang.t('arl.opEq')" value="=" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Threshold">
+        <el-form-item :label="lang.t('arl.threshold')">
           <el-input-number v-model="form.thresholdValue" :precision="2" style="width: 100%" />
         </el-form-item>
-        <el-form-item label="Duration (seconds)">
+        <el-form-item :label="lang.t('arl.duration')">
           <el-input-number v-model="form.durationSeconds" :min="0" style="width: 100%" />
         </el-form-item>
-        <el-form-item label="Alert Level">
+        <el-form-item :label="lang.t('arl.level')">
           <el-select v-model="form.alertLevel" style="width: 100%">
-            <el-option label="Low" :value="1" />
-            <el-option label="Medium" :value="2" />
-            <el-option label="High" :value="3" />
-            <el-option label="Critical" :value="4" />
+            <el-option :label="lang.t('arl.low')" :value="1" />
+            <el-option :label="lang.t('arl.medium')" :value="2" />
+            <el-option :label="lang.t('arl.high')" :value="3" />
+            <el-option :label="lang.t('arl.critical')" :value="4" />
           </el-select>
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" :loading="saving" @click="save">Save</el-button>
+        <el-button round @click="dialogVisible = false">{{ lang.t('common.cancel') }}</el-button>
+        <el-button type="primary" round :loading="saving" @click="save">{{ lang.t('common.save') }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -170,7 +170,11 @@ import {
   updateAlertRule,
 } from '@/api/alert'
 import { getAllSensorDicts } from '@/api/sensor'
+import { useLang } from '@/stores/lang'
+import { sensorTypeEn } from '@/i18n'
 import type { AlertRule, SensorDict } from '@/api/types'
+
+const lang = useLang()
 
 const loading = ref(false)
 const saving = ref(false)
@@ -187,14 +191,23 @@ const form = ref<AlertRule>({ operator: '>', durationSeconds: 60, alertLevel: 2 
 
 const dictOptions = ref<SensorDict[]>([])
 const dictMap = computed(() => {
-  const m = new Map<number, string>()
-  for (const d of dictOptions.value) if (d.id != null) m.set(d.id, d.typeName || `#${d.id}`)
+  const m = new Map<number, SensorDict>()
+  for (const d of dictOptions.value) if (d.id != null) m.set(d.id, d)
   return m
 })
 
+function dictLabel(d?: SensorDict) {
+  if (!d) return '-'
+  if (lang.lang === 'en' && d.typeCode && sensorTypeEn[d.typeCode]) {
+    return sensorTypeEn[d.typeCode]
+  }
+  return d.typeName || '-'
+}
+
 function dictNameOf(id?: number) {
   if (id == null) return '-'
-  return dictMap.value.get(id) || `#${id}`
+  const d = dictMap.value.get(id)
+  return d ? dictLabel(d) : `#${id}`
 }
 
 function operatorText(op?: string) {
@@ -205,7 +218,7 @@ function operatorText(op?: string) {
 }
 
 function levelText(level?: number) {
-  return ['', 'Low', 'Medium', 'High', 'Critical'][level || 0] || 'Unknown'
+  return ['', lang.t('arl.low'), lang.t('arl.medium'), lang.t('arl.high'), lang.t('arl.critical')][level || 0] || lang.t('common.unknown')
 }
 
 function levelType(level?: number) {
@@ -290,7 +303,7 @@ async function reload() {
     attachScrollListener()
     loadStats()
   } catch {
-    ElMessage.error('Failed to load alert rules. Please check the backend service.')
+    ElMessage.error(lang.t('common.loadFailed'))
   } finally {
     loading.value = false
   }
@@ -310,22 +323,22 @@ function openEdit(row: AlertRule) {
 
 async function save() {
   if (!form.value.ruleName?.trim()) {
-    ElMessage.warning('Rule name is required')
+    ElMessage.warning(lang.t('arl.nameRequired'))
     return
   }
   saving.value = true
   try {
     if (editing.value) {
       await updateAlertRule(form.value)
-      ElMessage.success('Updated successfully')
+      ElMessage.success(lang.t('common.updated'))
     } else {
       await addAlertRule(form.value)
-      ElMessage.success('Created successfully')
+      ElMessage.success(lang.t('common.created'))
     }
     dialogVisible.value = false
     reload()
   } catch {
-    ElMessage.error('Save failed. Please check the backend service.')
+    ElMessage.error(lang.t('common.saveFailed'))
   } finally {
     saving.value = false
   }
@@ -333,16 +346,16 @@ async function save() {
 
 async function confirmDelete(row: AlertRule) {
   try {
-    await ElMessageBox.confirm(`Are you sure to delete rule "${row.ruleName}"?`, 'Confirm Deletion', { type: 'warning' })
+    await ElMessageBox.confirm(lang.t('arl.deleteConfirm', { name: row.ruleName || '' }), lang.t('common.confirmDeletion'), { type: 'warning' })
   } catch {
     return
   }
   try {
     await deleteAlertRule(row.id!)
-    ElMessage.success('Deleted successfully')
+    ElMessage.success(lang.t('common.deleted'))
     reload()
   } catch {
-    ElMessage.error('Delete failed. Please check the backend service.')
+    ElMessage.error(lang.t('common.deleteFailed'))
   }
 }
 
@@ -368,7 +381,9 @@ onMounted(() => {
   align-items: center;
   gap: 14px;
   padding: 16px 18px;
+  transition: transform 0.2s ease;
 }
+.stat-card:hover { transform: translateY(-3px); }
 .stat-icon {
   width: 42px; height: 42px; flex: none;
   border-radius: 12px;

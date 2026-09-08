@@ -2,34 +2,34 @@
   <div class="nx-page">
     <div class="nx-page-header">
       <div>
-        <h2 class="nx-page-title">Port Management</h2>
-        <p class="nx-page-desc">Maintain global port registry with country and type filters</p>
+        <h2 class="nx-page-title">{{ lang.t('port.title') }}</h2>
+        <p class="nx-page-desc">{{ lang.t('port.desc') }}</p>
       </div>
-      <el-button type="primary" @click="openCreate"><el-icon><Plus /></el-icon>Add Port</el-button>
+      <el-button type="primary" round @click="openCreate"><el-icon><Plus /></el-icon>{{ lang.t('port.add') }}</el-button>
     </div>
 
     <div class="nx-panel filter-bar">
-      <el-input v-model="query.keyword" placeholder="Search port name" clearable style="width: 240px" @keyup.enter="reload" @clear="reload">
+      <el-input v-model="query.keyword" :placeholder="lang.t('port.search')" clearable style="width: 240px" @keyup.enter="reload" @clear="reload">
         <template #prefix><el-icon><Search /></el-icon></template>
       </el-input>
-      <el-select v-model="query.country" placeholder="Country" clearable filterable style="width: 180px" @change="reload">
+      <el-select v-model="query.country" :placeholder="lang.t('col.country')" clearable filterable style="width: 180px" @change="reload">
         <el-option v-for="c in countryOptions" :key="c" :label="c" :value="c" />
       </el-select>
-      <el-select v-model="sortField" placeholder="Sort By" clearable style="width: 150px" @change="reload">
-        <el-option label="Port Name" value="port_name" />
-        <el-option label="Country" value="country" />
-        <el-option label="Max Draft" value="max_draft" />
+      <el-select v-model="sortField" :placeholder="lang.t('common.sortBy')" clearable style="width: 150px" @change="reload">
+        <el-option :label="lang.t('port.sortName')" value="port_name" />
+        <el-option :label="lang.t('port.sortCountry')" value="country" />
+        <el-option :label="lang.t('port.sortDraft')" value="max_draft" />
       </el-select>
       <el-select v-model="sortOrder" style="width: 110px" @change="reload">
-        <el-option label="Ascending" value="asc" />
-        <el-option label="Descending" value="desc" />
+        <el-option :label="lang.t('common.asc')" value="asc" />
+        <el-option :label="lang.t('common.desc')" value="desc" />
       </el-select>
-      <el-button @click="reload"><el-icon><Refresh /></el-icon>Refresh</el-button>
+      <el-button round @click="reload"><el-icon><Refresh /></el-icon>{{ lang.t('common.refresh') }}</el-button>
     </div>
 
     <div class="nx-panel table-card">
       <div v-if="!loading && rows.length === 0" class="empty-state">
-        <el-empty description="No ports found">
+        <el-empty :description="lang.t('port.empty')">
           <template #image>
             <el-icon :size="60" color="#9ca3af"><Location /></el-icon>
           </template>
@@ -37,31 +37,31 @@
       </div>
       <template v-else>
         <div class="table-info">
-          <span class="result-count">{{ total }} ports found</span>
+          <span class="result-count">{{ lang.t('port.countFound', { n: total }) }}</span>
         </div>
         <el-table v-loading="loading" :data="rows" stripe height="calc(100vh - 340px)">
-        <el-table-column prop="id" label="ID" width="66" />
-        <el-table-column prop="portName" label="Port Name" min-width="160" show-overflow-tooltip />
-        <el-table-column prop="country" label="Country" width="110" />
-        <el-table-column prop="countryCode" label="Country Code" width="100" />
-        <el-table-column prop="portCode" label="Port Code" width="100" />
-        <el-table-column prop="portType" label="Type" width="100">
+        <el-table-column prop="id" :label="lang.t('col.id')" width="66" />
+        <el-table-column prop="portName" :label="lang.t('col.portName')" min-width="160" show-overflow-tooltip />
+        <el-table-column prop="country" :label="lang.t('col.country')" width="110" />
+        <el-table-column prop="countryCode" :label="lang.t('col.countryCode')" width="100" />
+        <el-table-column prop="portCode" :label="lang.t('col.portCode')" width="100" />
+        <el-table-column prop="portType" :label="lang.t('common.type')" width="100">
           <template #default="{ row }">
             <el-tag size="small" effect="plain" type="primary">{{ row.portType || '-' }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="Latitude" width="100">
+        <el-table-column :label="lang.t('col.latitude')" width="100">
           <template #default="{ row }">{{ row.latitude?.toFixed(4) ?? '-' }}</template>
         </el-table-column>
-        <el-table-column label="Longitude" width="100">
+        <el-table-column :label="lang.t('col.longitude')" width="100">
           <template #default="{ row }">{{ row.longitude?.toFixed(4) ?? '-' }}</template>
         </el-table-column>
-        <el-table-column prop="maxShipLength" label="Max LOA (m)" width="110" />
-        <el-table-column prop="maxDraft" label="Max Draft (m)" width="110" />
-        <el-table-column label="Actions" width="140" fixed="right">
+        <el-table-column prop="maxShipLength" :label="lang.t('col.maxLoa')" width="110" />
+        <el-table-column prop="maxDraft" :label="lang.t('col.maxDraft')" width="110" />
+        <el-table-column :label="lang.t('common.actions')" width="140" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" @click="openEdit(row)">Edit</el-button>
-            <el-button link type="danger" size="small" @click="confirmDelete(row)">Delete</el-button>
+            <el-button link type="primary" size="small" @click="openEdit(row)">{{ lang.t('common.edit') }}</el-button>
+            <el-button link type="danger" size="small" @click="confirmDelete(row)">{{ lang.t('common.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -80,41 +80,41 @@
       </template>
     </div>
 
-    <el-dialog v-model="dialogVisible" :title="editing ? 'Edit Port' : 'Add Port'" width="620px" destroy-on-close>
+    <el-dialog v-model="dialogVisible" :title="editing ? lang.t('port.editTitle') : lang.t('port.add')" width="620px" destroy-on-close>
       <el-form :model="form" label-width="100px">
         <div class="form-grid">
-          <el-form-item label="Port Name" required>
+          <el-form-item :label="lang.t('col.portName')" required>
             <el-input v-model="form.portName" />
           </el-form-item>
-          <el-form-item label="Country">
+          <el-form-item :label="lang.t('col.country')">
             <el-input v-model="form.country" />
           </el-form-item>
-          <el-form-item label="Country Code">
-            <el-input v-model="form.countryCode" placeholder="e.g. AU" />
+          <el-form-item :label="lang.t('col.countryCode')">
+            <el-input v-model="form.countryCode" :placeholder="lang.t('port.countryPh')" />
           </el-form-item>
-          <el-form-item label="Port Code">
+          <el-form-item :label="lang.t('col.portCode')">
             <el-input v-model="form.portCode" />
           </el-form-item>
-          <el-form-item label="Type">
-            <el-input v-model="form.portType" placeholder="e.g. Seaport / River" />
+          <el-form-item :label="lang.t('common.type')">
+            <el-input v-model="form.portType" :placeholder="lang.t('port.typePh')" />
           </el-form-item>
-          <el-form-item label="Latitude">
+          <el-form-item :label="lang.t('col.latitude')">
             <el-input-number v-model="form.latitude" :precision="6" :min="-90" :max="90" style="width: 100%" />
           </el-form-item>
-          <el-form-item label="Longitude">
+          <el-form-item :label="lang.t('col.longitude')">
             <el-input-number v-model="form.longitude" :precision="6" :min="-180" :max="180" style="width: 100%" />
           </el-form-item>
-          <el-form-item label="Max LOA (m)">
+          <el-form-item :label="lang.t('col.maxLoa')">
             <el-input-number v-model="form.maxShipLength" :min="0" :precision="1" style="width: 100%" />
           </el-form-item>
-          <el-form-item label="Max Draft (m)">
+          <el-form-item :label="lang.t('col.maxDraft')">
             <el-input-number v-model="form.maxDraft" :min="0" :precision="1" style="width: 100%" />
           </el-form-item>
         </div>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" :loading="saving" @click="save">Save</el-button>
+        <el-button round @click="dialogVisible = false">{{ lang.t('common.cancel') }}</el-button>
+        <el-button type="primary" round :loading="saving" @click="save">{{ lang.t('common.save') }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -124,7 +124,10 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { addPort, deletePort, getPortPage, updatePort } from '@/api/port'
+import { useLang } from '@/stores/lang'
 import type { Port } from '@/api/types'
+
+const lang = useLang()
 
 const loading = ref(false)
 const saving = ref(false)
@@ -161,7 +164,7 @@ async function reload() {
       if (p.country) countrySet.value.add(p.country)
     }
   } catch {
-    ElMessage.error('Failed to load port data. Please check the backend service.')
+    ElMessage.error(lang.t('common.loadFailed'))
   } finally {
     loading.value = false
   }
@@ -181,22 +184,22 @@ function openEdit(row: Port) {
 
 async function save() {
   if (!form.value.portName?.trim()) {
-    ElMessage.warning('Port name is required')
+    ElMessage.warning(lang.t('port.nameRequired'))
     return
   }
   saving.value = true
   try {
     if (editing.value) {
       await updatePort(form.value)
-      ElMessage.success('Updated successfully')
+      ElMessage.success(lang.t('common.updated'))
     } else {
       await addPort(form.value)
-      ElMessage.success('Created successfully')
+      ElMessage.success(lang.t('common.created'))
     }
     dialogVisible.value = false
     reload()
   } catch {
-    ElMessage.error('Save failed. Please check the backend service.')
+    ElMessage.error(lang.t('common.saveFailed'))
   } finally {
     saving.value = false
   }
@@ -204,16 +207,16 @@ async function save() {
 
 async function confirmDelete(row: Port) {
   try {
-    await ElMessageBox.confirm(`Are you sure to delete port "${row.portName}"?`, 'Confirm Deletion', { type: 'warning' })
+    await ElMessageBox.confirm(lang.t('port.deleteConfirm', { name: row.portName || '' }), lang.t('common.confirmDeletion'), { type: 'warning' })
   } catch {
     return
   }
   try {
     await deletePort(row.id!)
-    ElMessage.success('Deleted successfully')
+    ElMessage.success(lang.t('common.deleted'))
     reload()
   } catch {
-    ElMessage.error('Delete failed. Please check the backend service.')
+    ElMessage.error(lang.t('common.deleteFailed'))
   }
 }
 
