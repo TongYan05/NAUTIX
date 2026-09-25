@@ -1,3 +1,4 @@
+// @deprecated 教学草稿（无包名）。正式版见 shipsensor/demo/ExpressionStatementDemo.java —— 本文件按要求保留，勿删。
 public class hjcnv {
     public static void main(String[] args) {
         int total  = 0;//expression
